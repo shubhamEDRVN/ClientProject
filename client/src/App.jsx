@@ -1,10 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
+import Layout from './components/Layout';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import OverheadCalculator from './pages/OverheadCalculator';
 
 function RootRedirect() {
   const { isAuthenticated, loading } = useAuth();
@@ -16,7 +17,6 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Navbar />
         <Routes>
           <Route path="/" element={<RootRedirect />} />
           <Route path="/register" element={<Register />} />
@@ -25,7 +25,19 @@ export default function App() {
             path="/dashboard"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <Layout>
+                  <Dashboard />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/overhead"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <OverheadCalculator />
+                </Layout>
               </ProtectedRoute>
             }
           />
