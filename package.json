@@ -5,8 +5,7 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
-    "verify": "bash verify-module1.sh"
+    "dev": "nodemon src/server.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

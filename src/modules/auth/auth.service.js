@@ -3,6 +3,14 @@ const User = require('./user.model');
 const Company = require('../company/company.model');
 const ApiError = require('../../utils/ApiError');
 
+const getJwtSecret = () => {
+  if (process.env.JWT_SECRET) return process.env.JWT_SECRET;
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('JWT_SECRET environment variable is required in production');
+  }
+  return 'dev-secret-change-in-production';
+};
+
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
@@ -11,7 +19,7 @@ const COOKIE_OPTIONS = {
 };
 
 const generateToken = (payload) => {
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
+  return jwt.sign(payload, getJwtSecret(), { expiresIn: '1d' });
 };
 
 const register = async (name, email, password, companyName) => {
