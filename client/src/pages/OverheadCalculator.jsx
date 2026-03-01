@@ -109,6 +109,8 @@ export default function OverheadCalculator() {
   const [toast, setToast] = useState('');
   const autoSaveTimer = useRef(null);
   const debounceTimer = useRef(null);
+  const inputsRef = useRef(inputs);
+  inputsRef.current = inputs;
 
   // Load saved data on mount
   useEffect(() => {
@@ -137,10 +139,10 @@ export default function OverheadCalculator() {
   // Auto-save every 60 seconds
   useEffect(() => {
     autoSaveTimer.current = setInterval(() => {
-      saveToServer(inputs);
+      saveToServer(inputsRef.current);
     }, 60000);
     return () => clearInterval(autoSaveTimer.current);
-  }, [inputs]);
+  }, [saveToServer]);
 
   const saveToServer = useCallback(async (data) => {
     try {
@@ -159,7 +161,13 @@ export default function OverheadCalculator() {
   }, []);
 
   const handleChange = (key, rawValue) => {
-    const value = key === 'num_trucks' ? (parseInt(rawValue) || '') : rawValue;
+    let value;
+    if (key === 'num_trucks') {
+      const parsed = parseInt(rawValue);
+      value = isNaN(parsed) ? 1 : Math.max(1, parsed);
+    } else {
+      value = rawValue === '' ? 0 : parseFloat(rawValue) || 0;
+    }
     const updated = { ...inputs, [key]: value };
     setInputs(updated);
 
@@ -386,7 +394,7 @@ function CurrencyField({ label, value, onChange }) {
           type="number"
           min="0"
           step="0.01"
-          value={value === 0 ? '' : value}
+          value={value || ''}
           onChange={(e) => onChange(e.target.value === '' ? 0 : parseFloat(e.target.value))}
           placeholder="0.00"
           className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
@@ -405,7 +413,7 @@ function NumberField({ label, value, onChange, min, max, step = 1 }) {
         min={min}
         max={max}
         step={step}
-        value={value === 0 ? '' : value}
+        value={value || ''}
         onChange={(e) => onChange(e.target.value === '' ? 0 : parseFloat(e.target.value))}
         placeholder="0"
         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
