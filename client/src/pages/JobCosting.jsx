@@ -69,11 +69,11 @@ function calculateItem(item, fallbackRate) {
 function calculateTotals(calculations) {
   return calculations.reduce(
     (acc, c) => ({
-      total_materials: acc.total_materials + (c.line_cost || 0),
+      total_material_cost: acc.total_material_cost + (c.line_cost || 0),
       total_revenue: acc.total_revenue + (c.line_total || 0),
       total_profit: acc.total_profit + (c.line_profit || 0),
     }),
-    { total_materials: 0, total_revenue: 0, total_profit: 0 }
+    { total_material_cost: 0, total_revenue: 0, total_profit: 0 }
   );
 }
 
@@ -247,7 +247,7 @@ export default function JobCosting() {
       const calcs = activeJob.line_items.map((item) => calculateItem(item, hourlyRate));
       setCalculations(calcs);
     }
-  }, [activeJob?.line_items, hourlyRate]);
+  }, [activeJob, hourlyRate]);
 
   if (loading) {
     return (
@@ -474,7 +474,7 @@ function JobDetail({
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <SummaryCard label="Total Revenue" value={formatCurrency(totals.total_revenue)} color="indigo" />
-        <SummaryCard label="Total Materials (COGS)" value={formatCurrency(totals.total_materials)} color="amber" />
+        <SummaryCard label="Total Material Cost" value={formatCurrency(totals.total_material_cost)} color="amber" />
         <SummaryCard label="Total Profit" value={formatCurrency(totals.total_profit)} color="green" />
         <SummaryCard
           label="Overall Margin"
@@ -617,7 +617,7 @@ function JobDetail({
                   <td className="px-4 py-3"></td>
                   <td className="px-4 py-3"></td>
                   <td className="px-4 py-3 text-right text-gray-800">{formatCurrency(totals.total_revenue)}</td>
-                  <td className="px-4 py-3 text-right text-amber-600">{formatCurrency(totals.total_materials)}</td>
+                  <td className="px-4 py-3 text-right text-amber-600">{formatCurrency(totals.total_material_cost)}</td>
                   <td className="px-4 py-3 text-right text-green-600">{formatCurrency(totals.total_profit)}</td>
                   <td className="px-4 py-3 text-right">
                     <MarginBadge value={overallMargin} />

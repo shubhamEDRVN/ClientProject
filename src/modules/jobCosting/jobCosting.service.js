@@ -65,26 +65,26 @@ const calculateLineItems = (lineItems, fallbackRate) => {
 const calculateJobTotals = (calculatedItems) => {
   const totals = calculatedItems.reduce(
     (acc, item) => ({
-      total_materials: acc.total_materials.plus(new Decimal(item.line_cost)),
+      total_material_cost: acc.total_material_cost.plus(new Decimal(item.line_cost)),
       total_revenue: acc.total_revenue.plus(new Decimal(item.line_total)),
       total_labor_hours: acc.total_labor_hours.plus(
         new Decimal(item.labor_hours).times(new Decimal(item.quantity))
       ),
     }),
     {
-      total_materials: new Decimal(0),
+      total_material_cost: new Decimal(0),
       total_revenue: new Decimal(0),
       total_labor_hours: new Decimal(0),
     }
   );
 
-  const totalProfit = totals.total_revenue.minus(totals.total_materials);
+  const totalProfit = totals.total_revenue.minus(totals.total_material_cost);
   const overallMargin = totals.total_revenue.isZero()
     ? new Decimal(0)
     : totalProfit.dividedBy(totals.total_revenue).times(100);
 
   return {
-    total_materials: totals.total_materials.toDecimalPlaces(2).toNumber(),
+    total_material_cost: totals.total_material_cost.toDecimalPlaces(2).toNumber(),
     total_revenue: totals.total_revenue.toDecimalPlaces(2).toNumber(),
     total_profit: totalProfit.toDecimalPlaces(2).toNumber(),
     total_labor_hours: totals.total_labor_hours.toDecimalPlaces(2).toNumber(),
