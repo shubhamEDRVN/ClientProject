@@ -143,7 +143,8 @@ export default function PricingMatrix() {
     if (['material_cost', 'material_markup_pct', 'labor_hours'].includes(field)) {
       updated[index] = { ...updated[index], [field]: rawValue === '' ? 0 : parseFloat(rawValue) || 0 };
     } else if (field === 'hourly_rate_override') {
-      updated[index] = { ...updated[index], [field]: rawValue === '' ? null : parseFloat(rawValue) || null };
+      const parsed = parseFloat(rawValue);
+      updated[index] = { ...updated[index], [field]: rawValue === '' ? null : isNaN(parsed) ? null : parsed };
     } else {
       updated[index] = { ...updated[index], [field]: rawValue };
     }

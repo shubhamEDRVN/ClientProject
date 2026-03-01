@@ -22,7 +22,7 @@ const calculateServicePricing = (services, fallbackRate) => {
     const materialCost = new Decimal(svc.material_cost || 0);
     const markupPct = new Decimal(svc.material_markup_pct ?? 25);
     const laborHours = new Decimal(svc.labor_hours || 0);
-    const rate = new Decimal(svc.hourly_rate_override != null ? svc.hourly_rate_override : fallbackRate);
+    const rate = new Decimal(svc.hourly_rate_override ?? fallbackRate);
 
     const materialPrice = materialCost.times(new Decimal(1).plus(markupPct.dividedBy(100)));
     const laborPrice = laborHours.times(rate);

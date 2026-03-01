@@ -12,7 +12,7 @@ const serviceItemSchema = new mongoose.Schema({
   material_markup_pct: { type: Number, default: 25, min: 0 },
   labor_hours: { type: Number, default: 1, min: 0 },
   // hourly_rate is fetched from overhead at calculation time; user can also override per-item
-  hourly_rate_override: { type: Number, default: null, min: 0 },
+  hourly_rate_override: { type: Number, default: null },
 });
 
 const pricingMatrixSchema = new mongoose.Schema(
