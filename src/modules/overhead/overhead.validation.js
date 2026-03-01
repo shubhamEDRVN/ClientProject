@@ -1,0 +1,37 @@
+const Joi = require('joi');
+
+const overheadSchema = Joi.object({
+  owner_salary: Joi.number().min(0).default(0),
+  office_staff_1: Joi.number().min(0).default(0),
+  office_staff_2: Joi.number().min(0).default(0),
+  office_staff_3: Joi.number().min(0).default(0),
+  fuel: Joi.number().min(0).default(0),
+  vehicle_maintenance: Joi.number().min(0).default(0),
+  truck_1: Joi.number().min(0).default(0),
+  truck_2: Joi.number().min(0).default(0),
+  truck_3: Joi.number().min(0).default(0),
+  loan_payments: Joi.number().min(0).default(0),
+  workers_comp: Joi.number().min(0).default(0),
+  liability_insurance: Joi.number().min(0).default(0),
+  merchant_fees: Joi.number().min(0).default(0),
+  shop_rent: Joi.number().min(0).default(0),
+  cellular: Joi.number().min(0).default(0),
+  accounting: Joi.number().min(0).default(0),
+  software_subs: Joi.number().min(0).default(0),
+  marketing: Joi.number().min(0).default(0),
+  training: Joi.number().min(0).default(0),
+  uniforms: Joi.number().min(0).default(0),
+  tools: Joi.number().min(0).default(0),
+  payroll_processing: Joi.number().min(0).default(0),
+  auto_insurance: Joi.number().min(0).default(0),
+  licenses: Joi.number().min(0).default(0),
+  misc: Joi.number().min(0).default(0),
+  highest_tech_salary: Joi.number().min(0).default(0),
+  helper_salary: Joi.number().min(0).default(0),
+  num_trucks: Joi.number().integer().min(1).default(1),
+  working_days_per_year: Joi.number().min(1).default(125),
+  avg_hours_per_day: Joi.number().min(0.5).max(24).default(8),
+  total_revenue_last_year: Joi.number().min(0).default(0),
+});
+
+module.exports = { overheadSchema };
