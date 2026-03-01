@@ -74,8 +74,9 @@ export default function Dashboard() {
             icon="💰"
             label="Last Job COGS"
             value="—"
-            sub="Coming soon"
+            sub="Open Job Costing"
             color="green"
+            linkTo="/job-costing"
           />
         </div>
       ) : (
@@ -110,7 +111,7 @@ export default function Dashboard() {
           <div className="space-y-2">
             <QuickLink to="/overhead-calculator" icon="🧮" label="Overhead & Hourly Rate Calculator" />
             <QuickLink to="/pricing-matrix" icon="📋" label="Pricing Matrix" />
-            <QuickLink to="#" icon="💰" label="Job Costing" disabled />
+            <QuickLink to="/job-costing" icon="💰" label="Job Costing" />
             <QuickLink to="#" icon="📈" label="Business Scorecard" disabled />
             <QuickLink to="#" icon="🎯" label="Revenue Plan" disabled />
           </div>
