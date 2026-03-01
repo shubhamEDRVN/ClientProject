@@ -109,7 +109,7 @@ export default function Dashboard() {
           <h2 className="text-lg font-semibold text-gray-700 mb-4">Quick Actions</h2>
           <div className="space-y-2">
             <QuickLink to="/overhead-calculator" icon="🧮" label="Overhead & Hourly Rate Calculator" />
-            <QuickLink to="#" icon="📋" label="Pricing Matrix" disabled />
+            <QuickLink to="/pricing-matrix" icon="📋" label="Pricing Matrix" />
             <QuickLink to="#" icon="💰" label="Job Costing" disabled />
             <QuickLink to="#" icon="📈" label="Business Scorecard" disabled />
             <QuickLink to="#" icon="🎯" label="Revenue Plan" disabled />

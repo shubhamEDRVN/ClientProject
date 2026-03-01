@@ -9,6 +9,7 @@ const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
 const authRoutes = require('./modules/auth/auth.routes');
 const overheadRoutes = require('./modules/overhead/overhead.routes');
+const pricingRoutes = require('./modules/pricing/pricing.routes');
 const errorHandler = require('./middleware/errorHandler');
 const logger = require('./utils/logger');
 
@@ -56,6 +57,7 @@ app.get('/api/health', (req, res) => {
 // Routes
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/overhead', overheadRoutes);
+app.use('/api/pricing', pricingRoutes);
 
 // Global error handler
 app.use(errorHandler);
