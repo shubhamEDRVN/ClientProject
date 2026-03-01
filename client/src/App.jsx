@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/DashboardNew';
 import OverheadCalculator from './pages/OverheadCalculator';
 import PricingMatrix from './pages/PricingMatrix';
+import JobCosting from './pages/JobCosting';
 
 function RootRedirect() {
   const { isAuthenticated, loading } = useAuth();
@@ -57,6 +58,7 @@ export default function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/overhead-calculator" element={<OverheadCalculator />} />
             <Route path="/pricing-matrix" element={<PricingMatrix />} />
+            <Route path="/job-costing" element={<JobCosting />} />
           </Route>
         </Routes>
       </AuthProvider>

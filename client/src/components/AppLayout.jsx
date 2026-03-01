@@ -6,7 +6,7 @@ const NAV_ITEMS = [
   { to: '/dashboard', label: 'Dashboard', icon: '📊' },
   { to: '/overhead-calculator', label: 'Overhead Calculator', icon: '🧮' },
   { to: '/pricing-matrix', label: 'Pricing Matrix', icon: '📋' },
-  { to: '/job-costing', label: 'Job Costing', icon: '💰', disabled: true },
+  { to: '/job-costing', label: 'Job Costing', icon: '💰' },
   { to: '/scorecard', label: 'Scorecard', icon: '📈', disabled: true },
   { to: '/revenue-plan', label: 'Revenue Plan', icon: '🎯', disabled: true },
 ];
