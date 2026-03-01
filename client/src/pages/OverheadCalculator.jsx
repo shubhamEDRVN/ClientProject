@@ -136,14 +136,6 @@ export default function OverheadCalculator() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Auto-save every 60 seconds
-  useEffect(() => {
-    autoSaveTimer.current = setInterval(() => {
-      saveToServer(inputsRef.current);
-    }, 60000);
-    return () => clearInterval(autoSaveTimer.current);
-  }, [saveToServer]);
-
   const saveToServer = useCallback(async (data) => {
     try {
       setSaving(true);
@@ -159,6 +151,14 @@ export default function OverheadCalculator() {
       setSaving(false);
     }
   }, []);
+
+  // Auto-save every 60 seconds
+  useEffect(() => {
+    autoSaveTimer.current = setInterval(() => {
+      saveToServer(inputsRef.current);
+    }, 60000);
+    return () => clearInterval(autoSaveTimer.current);
+  }, [saveToServer]);
 
   const handleChange = (key, rawValue) => {
     let value;
