@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { Save, Check, Loader2 } from 'lucide-react';
 import api from '../api/axios';
 
 // Overhead line item definitions
@@ -185,7 +186,7 @@ export default function OverheadCalculator() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-10 w-10 border-4 border-indigo-600 border-t-transparent"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
       </div>
     );
   }
@@ -194,8 +195,8 @@ export default function OverheadCalculator() {
     <div className="max-w-6xl mx-auto">
       {/* Toast */}
       {toast && (
-        <div className="fixed top-20 right-4 z-50 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium animate-fade-in">
-          ✓ {toast}
+        <div className="fixed top-20 right-4 z-50 bg-blue-500 text-white px-4 py-2 rounded-md shadow-lg text-sm font-medium animate-fade-in flex items-center gap-2">
+          <Check className="h-4 w-4" /> {toast}
         </div>
       )}
 
@@ -208,15 +209,18 @@ export default function OverheadCalculator() {
         <button
           onClick={handleManualSave}
           disabled={saving}
-          className="inline-flex items-center gap-2 bg-indigo-600 text-white font-semibold px-5 py-2.5 rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 text-sm"
+          className="btn-primary inline-flex items-center gap-2 bg-blue-500 text-white font-semibold px-5 py-2.5 rounded-md hover:bg-blue-600 transition-all duration-200 disabled:opacity-50 text-sm"
         >
           {saving ? (
             <>
-              <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
+              <Loader2 className="h-4 w-4 animate-spin" />
               Saving...
             </>
           ) : (
-            'Save'
+            <>
+              <Save className="h-4 w-4" />
+              Save
+            </>
           )}
         </button>
       </div>
@@ -228,19 +232,19 @@ export default function OverheadCalculator() {
             label="Final Billable Hourly Rate"
             value={formatCurrency(results.finalBillableHourlyRate)}
             sub="/hr"
-            color="indigo"
+            color="blue"
             large
           />
           <ResultCard
             label="Daily Revenue — Total Company"
             value={formatCurrency(results.dailyRevenueTotal)}
-            color="blue"
+            color="cyan"
             large
           />
           <ResultCard
             label="Daily Revenue — Per Truck"
             value={formatCurrency(results.dailyRevenuePerTruck)}
-            color="cyan"
+            color="teal"
             large
           />
           <ResultCard
@@ -277,9 +281,9 @@ export default function OverheadCalculator() {
       {/* Input Forms */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Company Overhead */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+        <div className="bg-white rounded-lg border border-gray-100 shadow-sm">
           <div className="px-5 py-4 border-b border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-800">Company Overhead (Annual)</h2>
+            <h2 className="text-base font-semibold text-gray-800">Company Overhead (Annual)</h2>
             <p className="text-xs text-gray-500 mt-0.5">Enter all annual overhead costs</p>
           </div>
           <div className="p-5 space-y-3">
@@ -296,9 +300,9 @@ export default function OverheadCalculator() {
 
         <div className="space-y-6">
           {/* Technician Salaries */}
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+          <div className="bg-white rounded-lg border border-gray-100 shadow-sm">
             <div className="px-5 py-4 border-b border-gray-100">
-              <h2 className="text-lg font-semibold text-gray-800">Technician Salaries (Annual)</h2>
+              <h2 className="text-base font-semibold text-gray-800">Technician Salaries (Annual)</h2>
               <p className="text-xs text-gray-500 mt-0.5">Used for hourly rate add-on calculation</p>
             </div>
             <div className="p-5 space-y-3">
@@ -314,9 +318,9 @@ export default function OverheadCalculator() {
           </div>
 
           {/* Operational Inputs */}
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+          <div className="bg-white rounded-lg border border-gray-100 shadow-sm">
             <div className="px-5 py-4 border-b border-gray-100">
-              <h2 className="text-lg font-semibold text-gray-800">Operational Inputs</h2>
+              <h2 className="text-base font-semibold text-gray-800">Operational Inputs</h2>
             </div>
             <div className="p-5 space-y-3">
               {OP_FIELDS.map((field) => (
@@ -334,9 +338,9 @@ export default function OverheadCalculator() {
           </div>
 
           {/* Revenue Last Year */}
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+          <div className="bg-white rounded-lg border border-gray-100 shadow-sm">
             <div className="px-5 py-4 border-b border-gray-100">
-              <h2 className="text-lg font-semibold text-gray-800">Revenue Benchmark</h2>
+              <h2 className="text-base font-semibold text-gray-800">Revenue Benchmark</h2>
               <p className="text-xs text-gray-500 mt-0.5">Used to calculate overhead % of revenue</p>
             </div>
             <div className="p-5">
@@ -355,21 +359,21 @@ export default function OverheadCalculator() {
 
 // --- Sub-components ---
 
-function ResultCard({ label, value, sub, color = 'indigo', large }) {
-  const colorMap = {
-    indigo: 'bg-indigo-50 border-indigo-200 text-indigo-700',
-    blue: 'bg-blue-50 border-blue-200 text-blue-700',
-    cyan: 'bg-cyan-50 border-cyan-200 text-cyan-700',
-    amber: 'bg-amber-50 border-amber-200 text-amber-700',
-    green: 'bg-green-50 border-green-200 text-green-700',
-    red: 'bg-red-50 border-red-200 text-red-700',
+function ResultCard({ label, value, sub, color = 'blue', large }) {
+  const borderColorMap = {
+    blue: 'border-l-blue-500',
+    cyan: 'border-l-cyan-500',
+    teal: 'border-l-teal-500',
+    amber: 'border-l-amber-500',
+    green: 'border-l-green-500',
+    red: 'border-l-red-500',
   };
   return (
-    <div className={`rounded-xl border p-5 ${colorMap[color] || colorMap.indigo}`}>
-      <p className="text-xs font-medium uppercase tracking-wide opacity-75">{label}</p>
-      <p className={`${large ? 'text-2xl sm:text-3xl' : 'text-xl'} font-bold mt-1`}>
+    <div className={`bg-white border border-gray-100 rounded-lg shadow-sm border-l-4 ${borderColorMap[color] || borderColorMap.blue} p-5`}>
+      <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{label}</p>
+      <p className={`${large ? 'text-2xl sm:text-3xl' : 'text-xl'} font-bold mt-1 text-gray-800`}>
         {value}
-        {sub && <span className="text-sm font-normal ml-1 opacity-70">{sub}</span>}
+        {sub && <span className="text-sm font-normal ml-1 text-gray-500">{sub}</span>}
       </p>
     </div>
   );
@@ -377,7 +381,7 @@ function ResultCard({ label, value, sub, color = 'indigo', large }) {
 
 function MiniCard({ label, value }) {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-3 text-center">
+    <div className="bg-white border border-gray-100 rounded-md shadow-sm p-3 text-center">
       <p className="text-xs text-gray-500 mb-1">{label}</p>
       <p className="text-sm font-bold text-gray-800">{value}</p>
     </div>
@@ -397,7 +401,7 @@ function CurrencyField({ label, value, onChange }) {
           value={value || ''}
           onChange={(e) => onChange(e.target.value === '' ? 0 : parseFloat(e.target.value))}
           placeholder="0.00"
-          className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          className="input-field w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all duration-200"
         />
       </div>
     </div>
@@ -416,7 +420,7 @@ function NumberField({ label, value, onChange, min, max, step = 1 }) {
         value={value || ''}
         onChange={(e) => onChange(e.target.value === '' ? 0 : parseFloat(e.target.value))}
         placeholder="0"
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+        className="input-field w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all duration-200"
       />
     </div>
   );
