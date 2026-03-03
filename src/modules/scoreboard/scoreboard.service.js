@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const { Resource, UserProgress } = require('./scoreboard.model');
 const ApiError = require('../../utils/ApiError');
 
@@ -113,7 +114,7 @@ const getScoreboard = async (companyId) => {
 
   // Aggregate completed counts per user
   const progressAgg = await UserProgress.aggregate([
-    { $match: { companyId: resources[0].companyId, completed: true } },
+    { $match: { companyId: new mongoose.Types.ObjectId(companyId), completed: true } },
     {
       $group: {
         _id: '$userId',
