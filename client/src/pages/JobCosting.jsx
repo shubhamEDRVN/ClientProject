@@ -1,6 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
+import {
+  Plus, Save, Check, Loader2, ChevronRight, ChevronLeft,
+  Copy, Trash2, ClipboardList, Briefcase, User, Calendar, FileText,
+} from 'lucide-react';
 
 const CATEGORIES = [
   { value: 'hvac', label: 'HVAC' },
@@ -13,7 +17,7 @@ const STATUSES = [
   { value: 'draft', label: 'Draft', color: 'bg-gray-100 text-gray-700' },
   { value: 'sent', label: 'Sent', color: 'bg-blue-100 text-blue-700' },
   { value: 'accepted', label: 'Accepted', color: 'bg-green-100 text-green-700' },
-  { value: 'completed', label: 'Completed', color: 'bg-indigo-100 text-indigo-700' },
+  { value: 'completed', label: 'Completed', color: 'bg-blue-100 text-blue-700' },
   { value: 'cancelled', label: 'Cancelled', color: 'bg-red-100 text-red-700' },
 ];
 
@@ -252,7 +256,7 @@ export default function JobCosting() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-10 w-10 border-4 border-indigo-600 border-t-transparent"></div>
+        <Loader2 className="h-10 w-10 text-blue-500 animate-spin" />
       </div>
     );
   }
@@ -261,8 +265,8 @@ export default function JobCosting() {
     <div className="max-w-7xl mx-auto">
       {/* Toast */}
       {toast && (
-        <div className="fixed top-20 right-4 z-50 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium">
-          ✓ {toast}
+        <div className="fixed top-20 right-4 z-50 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium inline-flex items-center gap-2">
+          <Check className="w-4 h-4" /> {toast}
         </div>
       )}
 
@@ -313,32 +317,36 @@ function JobList({ jobs, onOpen, onCreate, onDelete, saving }) {
         <button
           onClick={onCreate}
           disabled={saving}
-          className="inline-flex items-center gap-2 bg-indigo-600 text-white font-semibold px-5 py-2.5 rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 text-sm"
+          className="inline-flex items-center gap-2 bg-blue-500 text-white font-semibold px-5 py-2.5 rounded-lg hover:bg-blue-600 transition-all duration-200 disabled:opacity-50 text-sm"
         >
           {saving ? (
             <>
-              <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
+              <Loader2 className="h-4 w-4 animate-spin" />
               Creating...
             </>
           ) : (
-            '+ New Job'
+            <>
+              <Plus className="w-4 h-4" />
+              New Job
+            </>
           )}
         </button>
       </div>
 
       {jobs.length === 0 ? (
-        <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-8 text-center">
-          <p className="text-3xl mb-3">💰</p>
-          <h3 className="text-indigo-800 font-semibold text-lg">No jobs yet</h3>
-          <p className="text-indigo-600 text-sm mt-1 mb-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-8 text-center">
+          <Briefcase className="w-10 h-10 text-blue-400 mx-auto mb-3" />
+          <h3 className="text-blue-800 font-semibold text-lg">No jobs yet</h3>
+          <p className="text-blue-600 text-sm mt-1 mb-4">
             Create your first job to start building estimates with accurate cost breakdowns.
           </p>
           <button
             onClick={onCreate}
             disabled={saving}
-            className="inline-flex items-center gap-2 bg-indigo-600 text-white font-semibold px-5 py-2.5 rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 text-sm"
+            className="inline-flex items-center gap-2 bg-blue-500 text-white font-semibold px-5 py-2.5 rounded-lg hover:bg-blue-600 transition-all duration-200 disabled:opacity-50 text-sm"
           >
-            + Create First Job
+            <Plus className="w-4 h-4" />
+            Create First Job
           </button>
         </div>
       ) : (
@@ -349,25 +357,33 @@ function JobList({ jobs, onOpen, onCreate, onDelete, saving }) {
             return (
               <div
                 key={job._id}
-                className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition p-5 flex flex-col sm:flex-row sm:items-center gap-4"
+                className="bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 p-5 flex flex-col sm:flex-row sm:items-center gap-4"
               >
                 <div className="flex-1 min-w-0 cursor-pointer" onClick={() => onOpen(job._id)}>
                   <div className="flex items-center gap-3 mb-1">
                     <h3 className="text-base font-semibold text-gray-800 truncate">{job.job_name}</h3>
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${status.color}`}>
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-md ${status.color}`}>
                       {status.label}
                     </span>
                   </div>
                   <div className="flex items-center gap-4 text-sm text-gray-500">
-                    {job.customer_name && <span>👤 {job.customer_name}</span>}
-                    <span>📋 {lineCount} {lineCount === 1 ? 'item' : 'items'}</span>
-                    <span>📅 {new Date(job.createdAt).toLocaleDateString()}</span>
+                    {job.customer_name && (
+                      <span className="inline-flex items-center gap-1">
+                        <User className="w-3.5 h-3.5" /> {job.customer_name}
+                      </span>
+                    )}
+                    <span className="inline-flex items-center gap-1">
+                      <FileText className="w-3.5 h-3.5" /> {lineCount} {lineCount === 1 ? 'item' : 'items'}
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5" /> {new Date(job.createdAt).toLocaleDateString()}
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => onOpen(job._id)}
-                    className="px-4 py-2 text-sm font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition"
+                    className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-all duration-200"
                   >
                     Open
                   </button>
@@ -375,13 +391,13 @@ function JobList({ jobs, onOpen, onCreate, onDelete, saving }) {
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => handleDelete(job._id)}
-                        className="px-3 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition"
+                        className="px-3 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-all duration-200"
                       >
                         Confirm
                       </button>
                       <button
                         onClick={() => setConfirmDelete(null)}
-                        className="px-3 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+                        className="px-3 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-all duration-200"
                       >
                         Cancel
                       </button>
@@ -389,12 +405,10 @@ function JobList({ jobs, onOpen, onCreate, onDelete, saving }) {
                   ) : (
                     <button
                       onClick={() => setConfirmDelete(job._id)}
-                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
                       title="Delete"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   )}
                 </div>
@@ -433,39 +447,41 @@ function JobDetail({
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
-            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition"
+            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200"
             title="Back to Jobs"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            <ChevronLeft className="w-5 h-5" />
           </button>
           <div>
             <h1 className="text-2xl font-bold text-gray-800">{job.job_name || 'Untitled Job'}</h1>
             <p className="text-gray-500 text-sm mt-0.5">
-              Using <span className="font-semibold text-indigo-600">{formatCurrency(hourlyRate)}/hr</span> billable rate
+              Using <span className="font-semibold text-blue-600">{formatCurrency(hourlyRate)}/hr</span> billable rate
             </p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <button
             onClick={onAddLineItem}
-            className="inline-flex items-center gap-2 bg-white border border-gray-300 text-gray-700 font-medium px-4 py-2.5 rounded-lg hover:bg-gray-50 transition text-sm"
+            className="inline-flex items-center gap-2 bg-white border border-gray-300 text-gray-700 font-medium px-4 py-2.5 rounded-lg hover:bg-gray-50 transition-all duration-200 text-sm"
           >
-            + Add Item
+            <Plus className="w-4 h-4" />
+            Add Item
           </button>
           <button
             onClick={onSave}
             disabled={saving}
-            className="inline-flex items-center gap-2 bg-indigo-600 text-white font-semibold px-5 py-2.5 rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 text-sm"
+            className="btn-primary inline-flex items-center gap-2 bg-blue-500 text-white font-semibold px-5 py-2.5 rounded-lg hover:bg-blue-600 transition-all duration-200 disabled:opacity-50 text-sm"
           >
             {saving ? (
               <>
-                <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
+                <Loader2 className="h-4 w-4 animate-spin" />
                 Saving...
               </>
             ) : (
-              'Save Job'
+              <>
+                <Save className="w-4 h-4" />
+                Save Job
+              </>
             )}
           </button>
         </div>
@@ -473,7 +489,7 @@ function JobDetail({
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-        <SummaryCard label="Total Revenue" value={formatCurrency(totals.total_revenue)} color="indigo" />
+        <SummaryCard label="Total Revenue" value={formatCurrency(totals.total_revenue)} color="blue" />
         <SummaryCard label="Total Material Cost" value={formatCurrency(totals.total_material_cost)} color="amber" />
         <SummaryCard label="Total Profit" value={formatCurrency(totals.total_profit)} color="green" />
         <SummaryCard
@@ -485,7 +501,7 @@ function JobDetail({
       </div>
 
       {/* Job Details Form */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+      <div className="bg-white rounded-lg border border-gray-100 shadow-sm mb-6">
         <div className="px-5 py-4 border-b border-gray-100">
           <h2 className="text-lg font-semibold text-gray-800">Job Details</h2>
         </div>
@@ -497,7 +513,7 @@ function JobDetail({
               value={job.job_name || ''}
               onChange={(e) => onUpdateField('job_name', e.target.value)}
               placeholder="e.g. Smith Residence AC Install"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
           <div>
@@ -507,7 +523,7 @@ function JobDetail({
               value={job.customer_name || ''}
               onChange={(e) => onUpdateField('customer_name', e.target.value)}
               placeholder="e.g. John Smith"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
           <div>
@@ -515,7 +531,7 @@ function JobDetail({
             <select
               value={job.status || 'draft'}
               onChange={(e) => onUpdateField('status', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+              className="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
             >
               {STATUSES.map((s) => (
                 <option key={s.value} value={s.value}>{s.label}</option>
@@ -529,7 +545,7 @@ function JobDetail({
               value={job.notes || ''}
               onChange={(e) => onUpdateField('notes', e.target.value)}
               placeholder="Optional notes"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -537,17 +553,18 @@ function JobDetail({
 
       {/* Line Items */}
       {(!job.line_items || job.line_items.length === 0) ? (
-        <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-8 text-center">
-          <p className="text-3xl mb-3">📋</p>
-          <h3 className="text-indigo-800 font-semibold text-lg">No line items yet</h3>
-          <p className="text-indigo-600 text-sm mt-1 mb-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-8 text-center">
+          <ClipboardList className="w-10 h-10 text-blue-400 mx-auto mb-3" />
+          <h3 className="text-blue-800 font-semibold text-lg">No line items yet</h3>
+          <p className="text-blue-600 text-sm mt-1 mb-4">
             Add line items to build your job estimate.
           </p>
           <button
             onClick={onAddLineItem}
-            className="inline-flex items-center gap-2 bg-indigo-600 text-white font-semibold px-5 py-2.5 rounded-lg hover:bg-indigo-700 transition text-sm"
+            className="inline-flex items-center gap-2 bg-blue-500 text-white font-semibold px-5 py-2.5 rounded-lg hover:bg-blue-600 transition-all duration-200 text-sm"
           >
-            + Add First Item
+            <Plus className="w-4 h-4" />
+            Add First Item
           </button>
         </div>
       ) : (
@@ -572,7 +589,7 @@ function JobDetail({
 
       {/* Summary Table */}
       {job.line_items && job.line_items.length > 0 && (
-        <div className="mt-8 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="mt-8 bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100">
             <h2 className="text-lg font-semibold text-gray-800">Job Cost Summary</h2>
           </div>
@@ -594,7 +611,7 @@ function JobDetail({
                 {job.line_items.map((item, idx) => {
                   const calc = calculations[idx] || {};
                   return (
-                    <tr key={item._id || idx} className="border-t border-gray-100 hover:bg-gray-50">
+                    <tr key={item._id || idx} className="border-t border-gray-100 hover:bg-gray-50 transition-all duration-200">
                       <td className="px-4 py-3 font-medium text-gray-800">{item.name || 'Untitled'}</td>
                       <td className="px-4 py-3">
                         <CategoryBadge category={item.category} />
@@ -638,22 +655,15 @@ function LineItemCard({ index, item, calc, hourlyRate, onUpdate, onRemove, onDup
   const [expanded, setExpanded] = useState(true);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+    <div className="bg-white rounded-lg border border-gray-100 shadow-sm">
       {/* Card header */}
       <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
         <button
           onClick={() => setExpanded(!expanded)}
-          className="text-gray-400 hover:text-gray-600 transition"
+          className="text-gray-400 hover:text-gray-600 transition-all duration-200"
           title={expanded ? 'Collapse' : 'Expand'}
         >
-          <svg
-            className={`w-5 h-5 transition-transform ${expanded ? 'rotate-90' : ''}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
+          <ChevronRight className={`w-5 h-5 transition-transform duration-200 ${expanded ? 'rotate-90' : ''}`} />
         </button>
         <span className="text-sm text-gray-400 font-mono">#{index + 1}</span>
         <span className="font-semibold text-gray-800 flex-1 truncate">
@@ -661,30 +671,26 @@ function LineItemCard({ index, item, calc, hourlyRate, onUpdate, onRemove, onDup
         </span>
         <CategoryBadge category={item.category} />
         {(item.quantity || 1) > 1 && (
-          <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+          <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md">
             ×{item.quantity}
           </span>
         )}
-        <span className="text-lg font-bold text-indigo-600">{formatCurrency(calc.line_total)}</span>
+        <span className="text-lg font-bold text-blue-600">{formatCurrency(calc.line_total)}</span>
         <MarginBadge value={calc.margin_pct} />
         <div className="flex gap-1 ml-2">
           <button
             onClick={() => onDuplicate(index)}
-            className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition"
+            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all duration-200"
             title="Duplicate"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
+            <Copy className="w-4 h-4" />
           </button>
           <button
             onClick={() => onRemove(index)}
-            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition"
+            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all duration-200"
             title="Remove"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
+            <Trash2 className="w-4 h-4" />
           </button>
         </div>
       </div>
@@ -702,7 +708,7 @@ function LineItemCard({ index, item, calc, hourlyRate, onUpdate, onRemove, onDup
                   value={item.name}
                   onChange={(e) => onUpdate(index, 'name', e.target.value)}
                   placeholder="e.g. AC Condenser Unit"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -711,7 +717,7 @@ function LineItemCard({ index, item, calc, hourlyRate, onUpdate, onRemove, onDup
                   <select
                     value={item.category}
                     onChange={(e) => onUpdate(index, 'category', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                    className="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                   >
                     {CATEGORIES.map((cat) => (
                       <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -726,7 +732,7 @@ function LineItemCard({ index, item, calc, hourlyRate, onUpdate, onRemove, onDup
                     step="1"
                     value={item.quantity || 1}
                     onChange={(e) => onUpdate(index, 'quantity', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -737,7 +743,7 @@ function LineItemCard({ index, item, calc, hourlyRate, onUpdate, onRemove, onDup
                   value={item.description}
                   onChange={(e) => onUpdate(index, 'description', e.target.value)}
                   placeholder="Optional notes"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -752,7 +758,7 @@ function LineItemCard({ index, item, calc, hourlyRate, onUpdate, onRemove, onDup
                       value={item.material_cost || ''}
                       onChange={(e) => onUpdate(index, 'material_cost', e.target.value)}
                       placeholder="0.00"
-                      className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="input-field w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -767,7 +773,7 @@ function LineItemCard({ index, item, calc, hourlyRate, onUpdate, onRemove, onDup
                       value={item.material_markup_pct || ''}
                       onChange={(e) => onUpdate(index, 'material_markup_pct', e.target.value)}
                       placeholder="25"
-                      className="w-full pr-7 pl-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="input-field w-full pr-7 pl-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
                   </div>
@@ -783,7 +789,7 @@ function LineItemCard({ index, item, calc, hourlyRate, onUpdate, onRemove, onDup
                     value={item.labor_hours || ''}
                     onChange={(e) => onUpdate(index, 'labor_hours', e.target.value)}
                     placeholder="0"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
                 <div>
@@ -800,7 +806,7 @@ function LineItemCard({ index, item, calc, hourlyRate, onUpdate, onRemove, onDup
                       value={item.hourly_rate_override ?? ''}
                       onChange={(e) => onUpdate(index, 'hourly_rate_override', e.target.value)}
                       placeholder={hourlyRate ? hourlyRate.toFixed(2) : '0.00'}
-                      className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="input-field w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -808,7 +814,7 @@ function LineItemCard({ index, item, calc, hourlyRate, onUpdate, onRemove, onDup
             </div>
 
             {/* Right: Calculated results */}
-            <div className="bg-gray-50 rounded-xl p-4 space-y-3">
+            <div className="bg-gray-50 rounded-md p-4 space-y-3">
               <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Cost Breakdown</h3>
               <div className="space-y-2">
                 <PricingRow label="Material Cost" value={formatCurrency(item.material_cost)} />
@@ -839,19 +845,25 @@ function LineItemCard({ index, item, calc, hourlyRate, onUpdate, onRemove, onDup
 
 // --- Sub-components ---
 
-function SummaryCard({ label, value, sub, color = 'indigo' }) {
-  const colorMap = {
-    indigo: 'bg-indigo-50 border-indigo-200 text-indigo-700',
-    blue: 'bg-blue-50 border-blue-200 text-blue-700',
-    amber: 'bg-amber-50 border-amber-200 text-amber-700',
-    green: 'bg-green-50 border-green-200 text-green-700',
-    red: 'bg-red-50 border-red-200 text-red-700',
-    cyan: 'bg-cyan-50 border-cyan-200 text-cyan-700',
+function SummaryCard({ label, value, sub, color = 'blue' }) {
+  const borderColorMap = {
+    blue: 'border-l-blue-500',
+    amber: 'border-l-amber-500',
+    green: 'border-l-green-500',
+    red: 'border-l-red-500',
+    cyan: 'border-l-cyan-500',
+  };
+  const textColorMap = {
+    blue: 'text-blue-700',
+    amber: 'text-amber-700',
+    green: 'text-green-700',
+    red: 'text-red-700',
+    cyan: 'text-cyan-700',
   };
   return (
-    <div className={`rounded-xl border p-5 ${colorMap[color] || colorMap.indigo}`}>
-      <p className="text-xs font-medium uppercase tracking-wide opacity-75">{label}</p>
-      <p className="text-2xl font-bold mt-1">
+    <div className={`bg-white rounded-lg border border-gray-100 border-l-4 ${borderColorMap[color] || borderColorMap.blue} shadow-sm p-5`}>
+      <p className={`text-xs font-medium uppercase tracking-wide ${textColorMap[color] || textColorMap.blue} opacity-75`}>{label}</p>
+      <p className={`text-2xl font-bold mt-1 ${textColorMap[color] || textColorMap.blue}`}>
         {value}
         {sub && <span className="text-sm font-normal ml-1 opacity-70">{sub}</span>}
       </p>
@@ -883,7 +895,7 @@ function CategoryBadge({ category }) {
   };
   const labels = { hvac: 'HVAC', plumbing: 'Plumbing', electrical: 'Electrical', general: 'General' };
   return (
-    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${colors[category] || colors.general}`}>
+    <span className={`text-xs font-medium px-2 py-0.5 rounded-md ${colors[category] || colors.general}`}>
       {labels[category] || category}
     </span>
   );
@@ -895,7 +907,7 @@ function MarginBadge({ value }) {
   if (v >= 40) color = 'bg-green-100 text-green-700';
   else if (v >= 20) color = 'bg-amber-100 text-amber-700';
   return (
-    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${color}`}>
+    <span className={`text-xs font-medium px-2 py-0.5 rounded-md ${color}`}>
       {formatPct(v)}
     </span>
   );
