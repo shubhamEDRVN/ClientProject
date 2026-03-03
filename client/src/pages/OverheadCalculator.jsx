@@ -209,7 +209,7 @@ export default function OverheadCalculator() {
         <button
           onClick={handleManualSave}
           disabled={saving}
-          className="btn-primary inline-flex items-center gap-2 bg-blue-500 text-white font-semibold px-5 py-2.5 rounded-md hover:bg-blue-600 transition-all duration-200 disabled:opacity-50 text-sm"
+          className="btn-primary font-semibold px-5 py-2.5"
         >
           {saving ? (
             <>
@@ -401,7 +401,7 @@ function CurrencyField({ label, value, onChange }) {
           value={value || ''}
           onChange={(e) => onChange(e.target.value === '' ? 0 : parseFloat(e.target.value))}
           placeholder="0.00"
-          className="input-field w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all duration-200"
+          className="input-field pl-7 pr-3 border-gray-300"
         />
       </div>
     </div>
@@ -420,7 +420,7 @@ function NumberField({ label, value, onChange, min, max, step = 1 }) {
         value={value || ''}
         onChange={(e) => onChange(e.target.value === '' ? 0 : parseFloat(e.target.value))}
         placeholder="0"
-        className="input-field w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all duration-200"
+        className="input-field border-gray-300"
       />
     </div>
   );
