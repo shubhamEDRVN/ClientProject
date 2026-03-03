@@ -39,12 +39,31 @@ export function ScoreProvider({ children }) {
     setCategories((prev) =>
       prev.map((cat) => ({
         ...cat,
-        systems: cat.systems.map((sys) =>
-          sys.resourceId === resourceId ? { ...sys, isCompleted: true } : sys
-        ),
+        systems: cat.systems.map((sys) => {
+          const hasResource = sys.resources.some((r) => r._id === resourceId);
+          if (!hasResource) return sys;
+          const updatedResources = sys.resources.map((r) =>
+            r._id === resourceId ? { ...r, isCompleted: true } : r
+          );
+          const newCompletedCount = updatedResources.filter((r) => r.isCompleted).length;
+          return {
+            ...sys,
+            resources: updatedResources,
+            completedResources: newCompletedCount,
+            isComplete: newCompletedCount === sys.totalResources,
+          };
+        }),
       }))
     );
-    setCompletedSystems((prev) => prev + 1);
+    setCompletedSystems((prev) => {
+      const wasComplete = categories.some((cat) =>
+        cat.systems.some((sys) =>
+          sys.resources.some((r) => r._id === resourceId) && !sys.isComplete
+            && sys.resources.filter((r) => r.isCompleted || r._id === resourceId).length === sys.totalResources
+        )
+      );
+      return wasComplete ? prev + 1 : prev;
+    });
 
     try {
       const res = await api.post(`/learn/complete/${resourceId}`);
@@ -70,12 +89,30 @@ export function ScoreProvider({ children }) {
     setCategories((prev) =>
       prev.map((cat) => ({
         ...cat,
-        systems: cat.systems.map((sys) =>
-          sys.resourceId === resourceId ? { ...sys, isCompleted: false } : sys
-        ),
+        systems: cat.systems.map((sys) => {
+          const hasResource = sys.resources.some((r) => r._id === resourceId);
+          if (!hasResource) return sys;
+          const updatedResources = sys.resources.map((r) =>
+            r._id === resourceId ? { ...r, isCompleted: false } : r
+          );
+          const newCompletedCount = updatedResources.filter((r) => r.isCompleted).length;
+          return {
+            ...sys,
+            resources: updatedResources,
+            completedResources: newCompletedCount,
+            isComplete: newCompletedCount === sys.totalResources,
+          };
+        }),
       }))
     );
-    setCompletedSystems((prev) => prev - 1);
+    setCompletedSystems((prev) => {
+      const wasComplete = categories.some((cat) =>
+        cat.systems.some((sys) =>
+          sys.resources.some((r) => r._id === resourceId) && sys.isComplete
+        )
+      );
+      return wasComplete ? prev - 1 : prev;
+    });
 
     try {
       const res = await api.delete(`/learn/complete/${resourceId}`);
