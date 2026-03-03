@@ -39,9 +39,9 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8 w-full max-w-md transition-all duration-200">
-        <p className="text-blue-500 font-semibold text-lg mb-6">BizManager</p>
+        <p className="text-blue-500 font-semibold text-lg mb-6">Profit Paybook Pro</p>
         <h2 className="text-xl font-semibold text-gray-800 mb-1">Welcome back</h2>
-        <p className="text-gray-500 text-sm mb-6">Sign in to your BizManager account</p>
+        <p className="text-gray-500 text-sm mb-6">Sign in to your Profit Paybook Pro account</p>
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-md mb-4">

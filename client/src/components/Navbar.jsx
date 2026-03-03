@@ -9,7 +9,7 @@ export default function Navbar() {
     <nav className="bg-white border-b border-gray-100">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         <Link to="/" className="text-xl text-blue-500 font-semibold tracking-tight">
-          BizManager
+          Profit Paybook Pro
         </Link>
         <div className="flex items-center gap-4">
           {isAuthenticated ? (
