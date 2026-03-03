@@ -449,7 +449,7 @@ function ServiceCard({ index, service, calc, hourlyRate, onUpdate, onRemove, onD
                   value={service.name}
                   onChange={(e) => onUpdate(index, 'name', e.target.value)}
                   placeholder="e.g. AC Repair — Standard"
-                  className="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="input-field"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -458,7 +458,7 @@ function ServiceCard({ index, service, calc, hourlyRate, onUpdate, onRemove, onD
                   <select
                     value={service.category}
                     onChange={(e) => onUpdate(index, 'category', e.target.value)}
-                    className="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                    className="input-field bg-white"
                   >
                     {CATEGORIES.map((cat) => (
                       <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -472,7 +472,7 @@ function ServiceCard({ index, service, calc, hourlyRate, onUpdate, onRemove, onD
                     value={service.description}
                     onChange={(e) => onUpdate(index, 'description', e.target.value)}
                     placeholder="Optional notes"
-                    className="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="input-field"
                   />
                 </div>
               </div>
@@ -488,7 +488,7 @@ function ServiceCard({ index, service, calc, hourlyRate, onUpdate, onRemove, onD
                       value={service.material_cost || ''}
                       onChange={(e) => onUpdate(index, 'material_cost', e.target.value)}
                       placeholder="0.00"
-                      className="input-field w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="input-field pl-7"
                     />
                   </div>
                 </div>
@@ -503,7 +503,7 @@ function ServiceCard({ index, service, calc, hourlyRate, onUpdate, onRemove, onD
                       value={service.material_markup_pct || ''}
                       onChange={(e) => onUpdate(index, 'material_markup_pct', e.target.value)}
                       placeholder="25"
-                      className="input-field w-full pr-7 pl-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="input-field pr-7"
                     />
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
                   </div>
@@ -519,7 +519,7 @@ function ServiceCard({ index, service, calc, hourlyRate, onUpdate, onRemove, onD
                     value={service.labor_hours || ''}
                     onChange={(e) => onUpdate(index, 'labor_hours', e.target.value)}
                     placeholder="1"
-                    className="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="input-field"
                   />
                 </div>
                 <div>
@@ -536,7 +536,7 @@ function ServiceCard({ index, service, calc, hourlyRate, onUpdate, onRemove, onD
                       value={service.hourly_rate_override ?? ''}
                       onChange={(e) => onUpdate(index, 'hourly_rate_override', e.target.value)}
                       placeholder={hourlyRate ? hourlyRate.toFixed(2) : '0.00'}
-                      className="input-field w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="input-field pl-7"
                     />
                   </div>
                 </div>

@@ -401,7 +401,7 @@ function CurrencyField({ label, value, onChange }) {
           value={value || ''}
           onChange={(e) => onChange(e.target.value === '' ? 0 : parseFloat(e.target.value))}
           placeholder="0.00"
-          className="input-field pl-7 pr-3 border-gray-300"
+          className="input-field pl-7"
         />
       </div>
     </div>
@@ -420,7 +420,7 @@ function NumberField({ label, value, onChange, min, max, step = 1 }) {
         value={value || ''}
         onChange={(e) => onChange(e.target.value === '' ? 0 : parseFloat(e.target.value))}
         placeholder="0"
-        className="input-field border-gray-300"
+        className="input-field"
       />
     </div>
   );

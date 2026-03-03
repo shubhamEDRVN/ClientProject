@@ -470,7 +470,7 @@ function JobDetail({
           <button
             onClick={onSave}
             disabled={saving}
-            className="btn-primary inline-flex items-center gap-2 bg-blue-500 text-white font-semibold px-5 py-2.5 rounded-lg hover:bg-blue-600 transition-all duration-200 disabled:opacity-50 text-sm"
+            className="btn-primary px-5 py-2.5"
           >
             {saving ? (
               <>
@@ -513,7 +513,7 @@ function JobDetail({
               value={job.job_name || ''}
               onChange={(e) => onUpdateField('job_name', e.target.value)}
               placeholder="e.g. Smith Residence AC Install"
-              className="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
             />
           </div>
           <div>
@@ -523,7 +523,7 @@ function JobDetail({
               value={job.customer_name || ''}
               onChange={(e) => onUpdateField('customer_name', e.target.value)}
               placeholder="e.g. John Smith"
-              className="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
             />
           </div>
           <div>
@@ -531,7 +531,7 @@ function JobDetail({
             <select
               value={job.status || 'draft'}
               onChange={(e) => onUpdateField('status', e.target.value)}
-              className="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+              className="input-field bg-white"
             >
               {STATUSES.map((s) => (
                 <option key={s.value} value={s.value}>{s.label}</option>
@@ -545,7 +545,7 @@ function JobDetail({
               value={job.notes || ''}
               onChange={(e) => onUpdateField('notes', e.target.value)}
               placeholder="Optional notes"
-              className="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
             />
           </div>
         </div>
@@ -708,7 +708,7 @@ function LineItemCard({ index, item, calc, hourlyRate, onUpdate, onRemove, onDup
                   value={item.name}
                   onChange={(e) => onUpdate(index, 'name', e.target.value)}
                   placeholder="e.g. AC Condenser Unit"
-                  className="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="input-field"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -717,7 +717,7 @@ function LineItemCard({ index, item, calc, hourlyRate, onUpdate, onRemove, onDup
                   <select
                     value={item.category}
                     onChange={(e) => onUpdate(index, 'category', e.target.value)}
-                    className="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                    className="input-field bg-white"
                   >
                     {CATEGORIES.map((cat) => (
                       <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -732,7 +732,7 @@ function LineItemCard({ index, item, calc, hourlyRate, onUpdate, onRemove, onDup
                     step="1"
                     value={item.quantity || 1}
                     onChange={(e) => onUpdate(index, 'quantity', e.target.value)}
-                    className="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="input-field"
                   />
                 </div>
               </div>
@@ -743,7 +743,7 @@ function LineItemCard({ index, item, calc, hourlyRate, onUpdate, onRemove, onDup
                   value={item.description}
                   onChange={(e) => onUpdate(index, 'description', e.target.value)}
                   placeholder="Optional notes"
-                  className="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="input-field"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -758,7 +758,7 @@ function LineItemCard({ index, item, calc, hourlyRate, onUpdate, onRemove, onDup
                       value={item.material_cost || ''}
                       onChange={(e) => onUpdate(index, 'material_cost', e.target.value)}
                       placeholder="0.00"
-                      className="input-field w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="input-field pl-7"
                     />
                   </div>
                 </div>
@@ -773,7 +773,7 @@ function LineItemCard({ index, item, calc, hourlyRate, onUpdate, onRemove, onDup
                       value={item.material_markup_pct || ''}
                       onChange={(e) => onUpdate(index, 'material_markup_pct', e.target.value)}
                       placeholder="25"
-                      className="input-field w-full pr-7 pl-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="input-field pr-7"
                     />
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
                   </div>
@@ -789,7 +789,7 @@ function LineItemCard({ index, item, calc, hourlyRate, onUpdate, onRemove, onDup
                     value={item.labor_hours || ''}
                     onChange={(e) => onUpdate(index, 'labor_hours', e.target.value)}
                     placeholder="0"
-                    className="input-field w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="input-field"
                   />
                 </div>
                 <div>
@@ -806,7 +806,7 @@ function LineItemCard({ index, item, calc, hourlyRate, onUpdate, onRemove, onDup
                       value={item.hourly_rate_override ?? ''}
                       onChange={(e) => onUpdate(index, 'hourly_rate_override', e.target.value)}
                       placeholder={hourlyRate ? hourlyRate.toFixed(2) : '0.00'}
-                      className="input-field w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="input-field pl-7"
                     />
                   </div>
                 </div>
