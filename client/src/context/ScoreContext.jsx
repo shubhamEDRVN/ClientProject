@@ -1,0 +1,184 @@
+import { createContext, useContext, useState, useCallback } from 'react';
+import api from '../api/axios';
+
+const ScoreContext = createContext(null);
+
+function recalcSystemScore(sys, updatedResources) {
+  const newCompletedCount = updatedResources.filter((r) => r.isCompleted).length;
+  const total = sys.totalResources;
+  let newSystemScore = 0;
+  if (total > 0 && newCompletedCount === total) {
+    newSystemScore = 10;
+  } else if (newCompletedCount > 0) {
+    newSystemScore = Math.floor((newCompletedCount / total) * 10);
+  }
+  return {
+    ...sys,
+    resources: updatedResources,
+    completedResources: newCompletedCount,
+    isComplete: total > 0 && newCompletedCount === total,
+    systemScore: newSystemScore,
+  };
+}
+
+function recalcCategory(cat, updatedSystems) {
+  const newCatScore = updatedSystems.reduce((s, sys) => s + (sys.systemScore || 0), 0);
+  const newCatMax = updatedSystems.length * 10;
+  return {
+    ...cat,
+    systems: updatedSystems,
+    categoryScore: newCatScore,
+    categoryMax: newCatMax,
+    categoryPercent: newCatMax > 0 ? parseFloat(((newCatScore / newCatMax) * 100).toFixed(1)) : 0,
+  };
+}
+
+export function ScoreProvider({ children }) {
+  const [categories, setCategories] = useState([]);
+  const [totalScore, setTotalScore] = useState(0);
+  const [healthPercent, setHealthPercent] = useState(0);
+  const [completedSystems, setCompletedSystems] = useState(0);
+  const [totalSystems, setTotalSystems] = useState(0);
+  const [scoreHistory, setScoreHistory] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchLearnData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await api.get('/learn/systems');
+      const { categories, totalScore, healthPercent, completedSystems, totalSystems } = res.data;
+      setCategories(categories);
+      setTotalScore(totalScore);
+      setHealthPercent(healthPercent);
+      setCompletedSystems(completedSystems);
+      setTotalSystems(totalSystems);
+    } catch (err) {
+      console.error('Failed to fetch learn data:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const markComplete = useCallback(async (resourceId) => {
+    const prevCategories = categories;
+    const prevTotalScore = totalScore;
+    const prevHealthPercent = healthPercent;
+    const prevCompletedSystems = completedSystems;
+
+    // Optimistically mark resource as completed and recalculate derived scores
+    setCategories((prev) =>
+      prev.map((cat) => {
+        const updatedSystems = cat.systems.map((sys) => {
+          const hasResource = sys.resources.some((r) => r._id === resourceId);
+          if (!hasResource) return sys;
+          const updatedResources = sys.resources.map((r) =>
+            r._id === resourceId ? { ...r, isCompleted: true } : r
+          );
+          return recalcSystemScore(sys, updatedResources);
+        });
+        return recalcCategory(cat, updatedSystems);
+      })
+    );
+    setCompletedSystems((prev) => {
+      const wasComplete = categories.some((cat) =>
+        cat.systems.some((sys) =>
+          sys.resources.some((r) => r._id === resourceId) && !sys.isComplete
+            && sys.resources.filter((r) => r.isCompleted || r._id === resourceId).length === sys.totalResources
+        )
+      );
+      return wasComplete ? prev + 1 : prev;
+    });
+
+    try {
+      const res = await api.post(`/learn/complete/${resourceId}`);
+      const { totalScore: newTotal, healthPercent: newHealth } = res.data;
+      setTotalScore(newTotal);
+      setHealthPercent(newHealth);
+    } catch (err) {
+      console.error('Failed to mark complete:', err);
+      setCategories(prevCategories);
+      setTotalScore(prevTotalScore);
+      setHealthPercent(prevHealthPercent);
+      setCompletedSystems(prevCompletedSystems);
+    }
+  }, [categories, totalScore, healthPercent, completedSystems]);
+
+  const unmarkComplete = useCallback(async (resourceId) => {
+    const prevCategories = categories;
+    const prevTotalScore = totalScore;
+    const prevHealthPercent = healthPercent;
+    const prevCompletedSystems = completedSystems;
+
+    // Optimistically mark resource as not completed and recalculate derived scores
+    setCategories((prev) =>
+      prev.map((cat) => {
+        const updatedSystems = cat.systems.map((sys) => {
+          const hasResource = sys.resources.some((r) => r._id === resourceId);
+          if (!hasResource) return sys;
+          const updatedResources = sys.resources.map((r) =>
+            r._id === resourceId ? { ...r, isCompleted: false } : r
+          );
+          return recalcSystemScore(sys, updatedResources);
+        });
+        return recalcCategory(cat, updatedSystems);
+      })
+    );
+    setCompletedSystems((prev) => {
+      const wasComplete = categories.some((cat) =>
+        cat.systems.some((sys) =>
+          sys.resources.some((r) => r._id === resourceId) && sys.isComplete
+        )
+      );
+      return wasComplete ? prev - 1 : prev;
+    });
+
+    try {
+      const res = await api.delete(`/learn/complete/${resourceId}`);
+      const { totalScore: newTotal, healthPercent: newHealth } = res.data;
+      setTotalScore(newTotal);
+      setHealthPercent(newHealth);
+    } catch (err) {
+      console.error('Failed to unmark complete:', err);
+      setCategories(prevCategories);
+      setTotalScore(prevTotalScore);
+      setHealthPercent(prevHealthPercent);
+      setCompletedSystems(prevCompletedSystems);
+    }
+  }, [categories, totalScore, healthPercent, completedSystems]);
+
+  const fetchHistory = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await api.get('/scorecard/history');
+      setScoreHistory(res.data.history);
+    } catch (err) {
+      console.error('Failed to fetch score history:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return (
+    <ScoreContext.Provider
+      value={{
+        categories,
+        totalScore,
+        healthPercent,
+        completedSystems,
+        totalSystems,
+        scoreHistory,
+        loading,
+        fetchLearnData,
+        markComplete,
+        unmarkComplete,
+        fetchHistory,
+      }}
+    >
+      {children}
+    </ScoreContext.Provider>
+  );
+}
+
+export function useScore() {
+  return useContext(ScoreContext);
+}
