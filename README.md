@@ -54,6 +54,12 @@ This is the backend for a financial decision platform designed for service and t
       jobCosting.routes.js
       jobCosting.validation.js
       jobCosting.model.js   # Job estimates with line items
+    /scoreboard
+      scoreboard.controller.js
+      scoreboard.service.js
+      scoreboard.routes.js
+      scoreboard.validation.js
+      scoreboard.model.js   # Linked resources & user progress tracking
   /middleware
     verifyJWT.js            # JWT authentication middleware
     roleAuthorization.js    # Role-based access control
@@ -213,6 +219,19 @@ Requires a valid `token` cookie (set automatically on login/register).
 | PUT    | `/api/jobs/:id`     | Yes (JWT)    | Update job (name, status, line items, etc) |
 | DELETE | `/api/jobs/:id`     | Yes (JWT)    | Delete a job                               |
 
+### Scoreboard (Linked Resources & Progress)
+
+| Method | Endpoint                              | Auth Required         | Description                                  |
+|--------|---------------------------------------|-----------------------|----------------------------------------------|
+| POST   | `/api/scoreboard/resources`           | Yes (owner/admin)     | Add a linked resource (YouTube, PDF, course) |
+| GET    | `/api/scoreboard/resources`           | Yes (JWT)             | List all resources for the company           |
+| GET    | `/api/scoreboard/resources/:id`       | Yes (JWT)             | Get a specific resource                      |
+| PUT    | `/api/scoreboard/resources/:id`       | Yes (owner/admin)     | Update a linked resource                     |
+| DELETE | `/api/scoreboard/resources/:id`       | Yes (owner/admin)     | Delete a linked resource                     |
+| GET    | `/api/scoreboard/progress`            | Yes (JWT)             | Get current user's progress on all resources |
+| PUT    | `/api/scoreboard/progress/:resourceId`| Yes (JWT)             | Mark a resource as complete/incomplete       |
+| GET    | `/api/scoreboard/leaderboard`         | Yes (JWT)             | Get company-wide scoreboard (all users)      |
+
 ### Financial Engine
 
 | Method | Endpoint                       | Auth Required | Description                                      |
@@ -341,6 +360,110 @@ Returns a live financial report aggregating current overhead data and all jobs f
       "job_summary": { "...aggregated job data..." },
       "notes": "First quarter financial review"
     }
+  }
+}
+```
+
+#### POST `/api/scoreboard/resources` (owner/admin only)
+
+**Request body:**
+```json
+{
+  "title": "HVAC Fundamentals Course",
+  "description": "Complete video series on HVAC basics",
+  "resource_type": "youtube",
+  "url": "https://www.youtube.com/watch?v=example123",
+  "category": "HVAC Training",
+  "display_order": 1
+}
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Resource created successfully",
+  "data": {
+    "resource": {
+      "_id": "...",
+      "title": "HVAC Fundamentals Course",
+      "description": "Complete video series on HVAC basics",
+      "resource_type": "youtube",
+      "url": "https://www.youtube.com/watch?v=example123",
+      "category": "HVAC Training",
+      "display_order": 1
+    }
+  }
+}
+```
+
+#### GET `/api/scoreboard/progress`
+
+Returns all resources with the current user's completion status.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Progress retrieved successfully",
+  "data": {
+    "resources": [
+      {
+        "_id": "...",
+        "title": "HVAC Fundamentals Course",
+        "resource_type": "youtube",
+        "url": "https://www.youtube.com/watch?v=example123",
+        "completed": true,
+        "completed_at": "2025-06-15T10:30:00.000Z"
+      },
+      {
+        "_id": "...",
+        "title": "Safety Manual PDF",
+        "resource_type": "pdf",
+        "url": "https://example.com/safety-manual.pdf",
+        "completed": false,
+        "completed_at": null
+      }
+    ],
+    "summary": {
+      "total_resources": 2,
+      "completed": 1,
+      "remaining": 1,
+      "progress_pct": 50
+    }
+  }
+}
+```
+
+#### PUT `/api/scoreboard/progress/:resourceId`
+
+**Request body:**
+```json
+{
+  "completed": true
+}
+```
+
+#### GET `/api/scoreboard/leaderboard`
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Scoreboard retrieved successfully",
+  "data": {
+    "scoreboard": [
+      {
+        "userId": "...",
+        "name": "John Doe",
+        "email": "john@example.com",
+        "completed_count": 8,
+        "total_resources": 10,
+        "progress_pct": 80,
+        "last_completed_at": "2025-06-20T14:00:00.000Z"
+      }
+    ],
+    "total_resources": 10
   }
 }
 ```
