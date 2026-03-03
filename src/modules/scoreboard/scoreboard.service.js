@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { Resource, UserProgress } = require('./scoreboard.model');
+const User = require('../auth/user.model');
 const ApiError = require('../../utils/ApiError');
 
 // ─── Admin: Resource CRUD ───────────────────────────────────────────
@@ -126,7 +127,6 @@ const getScoreboard = async (companyId) => {
   ]);
 
   // Look up user names
-  const User = require('../auth/user.model');
   const userIds = progressAgg.map((p) => p._id);
   const users = await User.find({ _id: { $in: userIds } }).select('name email').lean();
   const userMap = {};
