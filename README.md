@@ -66,7 +66,11 @@ This is the backend for a financial decision platform designed for service and t
     logger.js               # Logger utility
   /core
     /financialEngine
-      .gitkeep              # Placeholder for future module
+      financialEngine.model.js       # FinancialSnapshot Mongoose model
+      financialEngine.service.js     # Aggregation & report logic
+      financialEngine.controller.js  # Request/response handling
+      financialEngine.routes.js      # Route definitions
+      financialEngine.validation.js  # Joi schemas
   server.js                 # Entry point
 .env.example
 .gitignore
@@ -209,6 +213,16 @@ Requires a valid `token` cookie (set automatically on login/register).
 | PUT    | `/api/jobs/:id`     | Yes (JWT)    | Update job (name, status, line items, etc) |
 | DELETE | `/api/jobs/:id`     | Yes (JWT)    | Delete a job                               |
 
+### Financial Engine
+
+| Method | Endpoint                       | Auth Required | Description                                      |
+|--------|--------------------------------|---------------|--------------------------------------------------|
+| GET    | `/api/financial/report`        | Yes (JWT)     | Generate a live financial report                 |
+| POST   | `/api/financial/snapshots`     | Yes (JWT)     | Create and persist a financial snapshot          |
+| GET    | `/api/financial/snapshots`     | Yes (JWT)     | List all snapshots for the company               |
+| GET    | `/api/financial/snapshots/:id` | Yes (JWT)     | Get a specific financial snapshot                |
+| DELETE | `/api/financial/snapshots/:id` | Yes (JWT)     | Delete a financial snapshot                      |
+
 #### POST `/api/jobs`
 
 **Request body:**
@@ -259,6 +273,74 @@ Requires a valid `token` cookie (set automatically on login/register).
       "line_item_count": 1
     },
     "hourlyRate": 75
+  }
+}
+```
+
+#### GET `/api/financial/report`
+
+Returns a live financial report aggregating current overhead data and all jobs for the company. Optionally accepts `period_start` and `period_end` query parameters (ISO 8601 dates) to filter jobs by date range.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Financial report generated successfully",
+  "data": {
+    "overhead_summary": {
+      "total_annual_overhead": 150000,
+      "billable_hourly_rate": 75,
+      "revenue_target": 300000,
+      "total_billable_hours": 2000
+    },
+    "job_summary": {
+      "total_jobs": 12,
+      "total_revenue": 45000,
+      "total_material_cost": 18000,
+      "total_labor_hours": 160,
+      "total_profit": 27000,
+      "overall_margin_pct": 60,
+      "jobs_by_status": {
+        "draft": 2,
+        "sent": 3,
+        "accepted": 4,
+        "completed": 3,
+        "cancelled": 0
+      }
+    }
+  }
+}
+```
+
+#### POST `/api/financial/snapshots`
+
+**Request body:**
+```json
+{
+  "snapshot_name": "Q1 2025 Review",
+  "period_start": "2025-01-01",
+  "period_end": "2025-03-31",
+  "snapshot_type": "quarterly",
+  "notes": "First quarter financial review"
+}
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Financial snapshot created successfully",
+  "data": {
+    "snapshot": {
+      "_id": "...",
+      "snapshot_name": "Q1 2025 Review",
+      "period_start": "2025-01-01T00:00:00.000Z",
+      "period_end": "2025-03-31T00:00:00.000Z",
+      "snapshot_type": "quarterly",
+      "overhead_summary": { "...aggregated overhead data..." },
+      "job_summary": { "...aggregated job data..." },
+      "notes": "First quarter financial review"
+    }
   }
 }
 ```

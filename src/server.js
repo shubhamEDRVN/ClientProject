@@ -11,6 +11,7 @@ const authRoutes = require('./modules/auth/auth.routes');
 const overheadRoutes = require('./modules/overhead/overhead.routes');
 const pricingRoutes = require('./modules/pricing/pricing.routes');
 const jobCostingRoutes = require('./modules/jobCosting/jobCosting.routes');
+const financialEngineRoutes = require('./core/financialEngine/financialEngine.routes');
 const errorHandler = require('./middleware/errorHandler');
 const logger = require('./utils/logger');
 
@@ -60,6 +61,7 @@ app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/overhead', overheadRoutes);
 app.use('/api/pricing', pricingRoutes);
 app.use('/api/jobs', jobCostingRoutes);
+app.use('/api/financial', financialEngineRoutes);
 
 // Global error handler
 app.use(errorHandler);
