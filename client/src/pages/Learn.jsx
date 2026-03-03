@@ -245,12 +245,21 @@ export default function Learn() {
       for (const cat of categories) {
         const found = cat.systems.find((s) => s._id === selectedSystem._id);
         if (found) {
-          setSelectedSystem({ ...found, categoryName: cat.name });
+          setSelectedSystem((prev) => {
+            if (!prev) return { ...found, categoryName: cat.name };
+            // Only update if data actually changed
+            const resourcesChanged = found.resources.some((r, i) =>
+              !prev.resources[i] || prev.resources[i].isCompleted !== r.isCompleted
+            );
+            if (!resourcesChanged && prev.completedResources === found.completedResources
+                && prev.isComplete === found.isComplete) return prev;
+            return { ...found, categoryName: cat.name };
+          });
           break;
         }
       }
     }
-  }, [categories]);
+  }, [categories, selectedSystem?._id]);
 
   if (loading && categories.length === 0) {
     return (

@@ -27,6 +27,12 @@ function AuthPages() {
   return isAuthenticated ? null : <Navbar />;
 }
 
+function AdminRoute({ children }) {
+  const { user } = useAuth();
+  if (user?.role !== 'admin') return <Navigate to="/dashboard" replace />;
+  return children;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -67,7 +73,7 @@ export default function App() {
             <Route path="/job-costing" element={<JobCosting />} />
             <Route path="/learn" element={<Learn />} />
             <Route path="/scorecard" element={<Scorecard />} />
-            <Route path="/admin/learn" element={<AdminLearn />} />
+            <Route path="/admin/learn" element={<AdminRoute><AdminLearn /></AdminRoute>} />
           </Route>
         </Routes>
       </AuthProvider>

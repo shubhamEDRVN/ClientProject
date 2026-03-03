@@ -3,6 +3,36 @@ import api from '../api/axios';
 
 const ScoreContext = createContext(null);
 
+function recalcSystemScore(sys, updatedResources) {
+  const newCompletedCount = updatedResources.filter((r) => r.isCompleted).length;
+  const total = sys.totalResources;
+  let newSystemScore = 0;
+  if (total > 0 && newCompletedCount === total) {
+    newSystemScore = 10;
+  } else if (newCompletedCount > 0) {
+    newSystemScore = Math.floor((newCompletedCount / total) * 10);
+  }
+  return {
+    ...sys,
+    resources: updatedResources,
+    completedResources: newCompletedCount,
+    isComplete: total > 0 && newCompletedCount === total,
+    systemScore: newSystemScore,
+  };
+}
+
+function recalcCategory(cat, updatedSystems) {
+  const newCatScore = updatedSystems.reduce((s, sys) => s + (sys.systemScore || 0), 0);
+  const newCatMax = updatedSystems.length * 10;
+  return {
+    ...cat,
+    systems: updatedSystems,
+    categoryScore: newCatScore,
+    categoryMax: newCatMax,
+    categoryPercent: newCatMax > 0 ? parseFloat(((newCatScore / newCatMax) * 100).toFixed(1)) : 0,
+  };
+}
+
 export function ScoreProvider({ children }) {
   const [categories, setCategories] = useState([]);
   const [totalScore, setTotalScore] = useState(0);
@@ -35,25 +65,19 @@ export function ScoreProvider({ children }) {
     const prevHealthPercent = healthPercent;
     const prevCompletedSystems = completedSystems;
 
-    // Optimistically mark resource as completed
+    // Optimistically mark resource as completed and recalculate derived scores
     setCategories((prev) =>
-      prev.map((cat) => ({
-        ...cat,
-        systems: cat.systems.map((sys) => {
+      prev.map((cat) => {
+        const updatedSystems = cat.systems.map((sys) => {
           const hasResource = sys.resources.some((r) => r._id === resourceId);
           if (!hasResource) return sys;
           const updatedResources = sys.resources.map((r) =>
             r._id === resourceId ? { ...r, isCompleted: true } : r
           );
-          const newCompletedCount = updatedResources.filter((r) => r.isCompleted).length;
-          return {
-            ...sys,
-            resources: updatedResources,
-            completedResources: newCompletedCount,
-            isComplete: newCompletedCount === sys.totalResources,
-          };
-        }),
-      }))
+          return recalcSystemScore(sys, updatedResources);
+        });
+        return recalcCategory(cat, updatedSystems);
+      })
     );
     setCompletedSystems((prev) => {
       const wasComplete = categories.some((cat) =>
@@ -85,25 +109,19 @@ export function ScoreProvider({ children }) {
     const prevHealthPercent = healthPercent;
     const prevCompletedSystems = completedSystems;
 
-    // Optimistically mark resource as not completed
+    // Optimistically mark resource as not completed and recalculate derived scores
     setCategories((prev) =>
-      prev.map((cat) => ({
-        ...cat,
-        systems: cat.systems.map((sys) => {
+      prev.map((cat) => {
+        const updatedSystems = cat.systems.map((sys) => {
           const hasResource = sys.resources.some((r) => r._id === resourceId);
           if (!hasResource) return sys;
           const updatedResources = sys.resources.map((r) =>
             r._id === resourceId ? { ...r, isCompleted: false } : r
           );
-          const newCompletedCount = updatedResources.filter((r) => r.isCompleted).length;
-          return {
-            ...sys,
-            resources: updatedResources,
-            completedResources: newCompletedCount,
-            isComplete: newCompletedCount === sys.totalResources,
-          };
-        }),
-      }))
+          return recalcSystemScore(sys, updatedResources);
+        });
+        return recalcCategory(cat, updatedSystems);
+      })
     );
     setCompletedSystems((prev) => {
       const wasComplete = categories.some((cat) =>
