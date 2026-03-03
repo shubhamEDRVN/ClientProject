@@ -30,6 +30,7 @@ const buildOverheadSummary = async (userId) => {
 
 /**
  * Build job summary by aggregating all jobs for a company within an optional date range.
+ * Jobs are filtered by createdAt since the Job model does not have a dedicated job date field.
  */
 const buildJobSummary = async (companyId, userId, periodStart, periodEnd) => {
   const query = { companyId };
