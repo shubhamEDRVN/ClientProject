@@ -50,7 +50,7 @@ export default function AppLayout() {
       >
         {/* Brand */}
         <div className="h-16 flex items-center justify-between px-6 border-b border-gray-100">
-          <span className="text-xl font-semibold text-blue-500">BizManager</span>
+          <span className="text-xl font-semibold text-blue-500">Profit Paybook Pro</span>
           <button
             onClick={() => setSidebarOpen(false)}
             className="lg:hidden p-1 text-gray-400 hover:text-gray-600 transition-all duration-200"
@@ -124,7 +124,7 @@ export default function AppLayout() {
           >
             <Menu className="w-6 h-6" />
           </button>
-          <div className="lg:hidden ml-3 text-lg font-semibold text-blue-500">BizManager</div>
+          <div className="lg:hidden ml-3 text-lg font-semibold text-blue-500">Profit Paybook Pro</div>
         </header>
 
         {/* Page content */}
