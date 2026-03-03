@@ -13,6 +13,10 @@ const pricingRoutes = require('./modules/pricing/pricing.routes');
 const jobCostingRoutes = require('./modules/jobCosting/jobCosting.routes');
 const scoreboardRoutes = require('./modules/scoreboard/scoreboard.routes');
 const financialEngineRoutes = require('./core/financialEngine/financialEngine.routes');
+const learnRoutes = require('./modules/learn/learn.routes');
+const scorecardRoutes = require('./modules/learn/scorecard.routes');
+const adminLearnRoutes = require('./modules/learn/admin.routes');
+const { seedScorecardSystems } = require('./modules/learn/learn.seed');
 const errorHandler = require('./middleware/errorHandler');
 const logger = require('./utils/logger');
 
@@ -64,6 +68,9 @@ app.use('/api/pricing', pricingRoutes);
 app.use('/api/jobs', jobCostingRoutes);
 app.use('/api/scoreboard', scoreboardRoutes);
 app.use('/api/financial', financialEngineRoutes);
+app.use('/api/learn', learnRoutes);
+app.use('/api/scorecard', scorecardRoutes);
+app.use('/api/admin', adminLearnRoutes);
 
 // Global error handler
 app.use(errorHandler);
@@ -72,6 +79,7 @@ const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   await connectDB();
+  await seedScorecardSystems();
   app.listen(PORT, () => {
     logger.info(`Server running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
   });

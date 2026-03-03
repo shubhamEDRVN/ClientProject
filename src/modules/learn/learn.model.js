@@ -21,7 +21,7 @@ const learningresourceSchema = new mongoose.Schema({
 learningresourceSchema.index({ systemId: 1, sortOrder: 1 });
 
 const resourcecompletionSchema = new mongoose.Schema({
-  userId:            { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  userId:            { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
   completedIds:      [{ type: mongoose.Schema.Types.ObjectId, ref: 'LearningResource' }],
   lastUpdated:       { type: Date, default: Date.now },
 });
