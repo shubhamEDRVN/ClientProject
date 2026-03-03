@@ -1,25 +1,27 @@
 import { Link } from 'react-router-dom';
+import { LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
   const { isAuthenticated, user, logout } = useAuth();
 
   return (
-    <nav className="bg-indigo-600 text-white shadow-md">
+    <nav className="bg-white border-b border-gray-100">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-        <Link to="/" className="text-xl font-bold tracking-tight">
+        <Link to="/" className="text-xl text-blue-500 font-semibold tracking-tight">
           BizManager
         </Link>
         <div className="flex items-center gap-4">
           {isAuthenticated ? (
             <>
-              <span className="text-indigo-200 text-sm">
-                Hello, <span className="font-semibold text-white">{user?.name}</span>
+              <span className="text-gray-600 text-sm">
+                Hello, <span className="font-semibold text-gray-900">{user?.name}</span>
               </span>
               <button
                 onClick={logout}
-                className="bg-white text-indigo-600 text-sm font-semibold px-4 py-1.5 rounded-lg hover:bg-indigo-50 transition"
+                className="bg-blue-500 text-white text-sm font-semibold px-4 py-1.5 rounded-md hover:bg-blue-600 transition-all duration-200 inline-flex items-center gap-1.5"
               >
+                <LogOut className="w-4 h-4" />
                 Logout
               </button>
             </>
@@ -27,13 +29,13 @@ export default function Navbar() {
             <>
               <Link
                 to="/login"
-                className="text-sm font-medium text-indigo-100 hover:text-white transition"
+                className="text-sm font-medium text-gray-600 hover:text-blue-500 transition-all duration-200"
               >
                 Login
               </Link>
               <Link
                 to="/register"
-                className="bg-white text-indigo-600 text-sm font-semibold px-4 py-1.5 rounded-lg hover:bg-indigo-50 transition"
+                className="bg-blue-500 text-white text-sm font-semibold px-4 py-1.5 rounded-md hover:bg-blue-600 transition-all duration-200"
               >
                 Register
               </Link>
