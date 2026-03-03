@@ -11,6 +11,8 @@ import {
   Menu,
   LogOut,
   X,
+  BookOpen,
+  Settings,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -18,8 +20,13 @@ const NAV_ITEMS = [
   { to: '/overhead-calculator', label: 'Overhead Calculator', icon: Calculator },
   { to: '/pricing-matrix', label: 'Pricing Matrix', icon: Grid3X3 },
   { to: '/job-costing', label: 'Job Costing', icon: Briefcase },
-  { to: '/scorecard', label: 'Scorecard', icon: Award, disabled: true },
+  { to: '/learn', label: 'Learn', icon: BookOpen },
+  { to: '/scorecard', label: 'Scorecard', icon: Award },
   { to: '/revenue-plan', label: 'Revenue Plan', icon: Target, disabled: true },
+];
+
+const ADMIN_NAV_ITEMS = [
+  { to: '/admin/learn', label: 'Manage Learn', icon: Settings, adminOnly: true },
 ];
 
 export default function AppLayout() {
@@ -74,6 +81,26 @@ export default function AppLayout() {
                 <span className="ml-auto text-xs bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded">Soon</span>
               </span>
             ) : (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                onClick={() => setSidebarOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? 'bg-blue-50 text-blue-600 border-l-2 border-blue-500'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  }`
+                }
+              >
+                <Icon className="w-5 h-5" />
+                <span>{item.label}</span>
+              </NavLink>
+            );
+          })}
+          {user?.role === 'admin' && ADMIN_NAV_ITEMS.map((item) => {
+            const Icon = item.icon;
+            return (
               <NavLink
                 key={item.to}
                 to={item.to}

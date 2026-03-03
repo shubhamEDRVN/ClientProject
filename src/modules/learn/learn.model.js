@@ -25,7 +25,6 @@ const resourcecompletionSchema = new mongoose.Schema({
   completedIds:      [{ type: mongoose.Schema.Types.ObjectId, ref: 'LearningResource' }],
   lastUpdated:       { type: Date, default: Date.now },
 });
-resourcecompletionSchema.index({ userId: 1 }, { unique: true });
 
 const scorecardhistorySchema = new mongoose.Schema({
   userId:        { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },

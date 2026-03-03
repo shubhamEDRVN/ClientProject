@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ScoreProvider } from './context/ScoreContext';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppLayout from './components/AppLayout';
@@ -9,6 +10,9 @@ import Dashboard from './pages/DashboardNew';
 import OverheadCalculator from './pages/OverheadCalculator';
 import PricingMatrix from './pages/PricingMatrix';
 import JobCosting from './pages/JobCosting';
+import Learn from './pages/Learn';
+import Scorecard from './pages/Scorecard';
+import AdminLearn from './pages/AdminLearn';
 
 function RootRedirect() {
   const { isAuthenticated, loading } = useAuth();
@@ -51,7 +55,9 @@ export default function App() {
           <Route
             element={
               <ProtectedRoute>
-                <AppLayout />
+                <ScoreProvider>
+                  <AppLayout />
+                </ScoreProvider>
               </ProtectedRoute>
             }
           >
@@ -59,6 +65,9 @@ export default function App() {
             <Route path="/overhead-calculator" element={<OverheadCalculator />} />
             <Route path="/pricing-matrix" element={<PricingMatrix />} />
             <Route path="/job-costing" element={<JobCosting />} />
+            <Route path="/learn" element={<Learn />} />
+            <Route path="/scorecard" element={<Scorecard />} />
+            <Route path="/admin/learn" element={<AdminLearn />} />
           </Route>
         </Routes>
       </AuthProvider>
