@@ -6,7 +6,7 @@ const ApiError = require('../../utils/ApiError');
 
 const calculateUserScore = async (userId) => {
   const systems = await ScorecardSystem.find({ isActive: true }).lean();
-  const resources = await LearningResource.find({ isActive: true }).lean();
+  const resources = await LearningResource.find({ isActive: true, moderationStatus: 'approved' }).lean();
   const completion = await ResourceCompletion.findOne({ userId }).lean();
 
   const completedSet = new Set(
@@ -94,7 +94,7 @@ const getSystemsForUser = async (userId) => {
   const systems = await ScorecardSystem.find({ isActive: true })
     .sort({ category: 1, sortOrder: 1 })
     .lean();
-  const resources = await LearningResource.find({ isActive: true })
+  const resources = await LearningResource.find({ isActive: true, moderationStatus: 'approved' })
     .sort({ sortOrder: 1 })
     .lean();
   const completion = await ResourceCompletion.findOne({ userId }).lean();
@@ -393,6 +393,54 @@ const getResourcesForSystemAdmin = async (systemId) => {
   return LearningResource.find({ systemId }).sort({ sortOrder: 1 }).lean();
 };
 
+// ─── Admin: Moderation ──────────────────────────────────────────────
+
+const getPendingResources = async () => {
+  return LearningResource.find({ moderationStatus: 'pending' })
+    .populate('systemId', 'name category')
+    .sort({ createdAt: -1 })
+    .lean();
+};
+
+const getModerationQueue = async (status) => {
+  const filter = status ? { moderationStatus: status } : {};
+  return LearningResource.find(filter)
+    .populate('systemId', 'name category')
+    .populate('moderatedBy', 'name email')
+    .sort({ createdAt: -1 })
+    .lean();
+};
+
+const moderateResource = async (resourceId, status, adminUserId, note = '') => {
+  const resource = await LearningResource.findById(resourceId);
+  if (!resource) throw ApiError.notFound('Resource not found');
+
+  resource.moderationStatus = status;
+  resource.moderatedBy = adminUserId;
+  resource.moderatedAt = new Date();
+  resource.moderationNote = note;
+  await resource.save();
+
+  return resource;
+};
+
+// ─── Admin: Dashboard Stats ─────────────────────────────────────────
+
+const getAdminStats = async () => {
+  const User = require('../auth/user.model');
+  const Company = require('../company/company.model');
+
+  const [totalCompanies, totalUsers, totalResources, pendingModeration, totalSystems] = await Promise.all([
+    Company.countDocuments(),
+    User.countDocuments(),
+    LearningResource.countDocuments(),
+    LearningResource.countDocuments({ moderationStatus: 'pending' }),
+    ScorecardSystem.countDocuments({ isActive: true }),
+  ]);
+
+  return { totalCompanies, totalUsers, totalResources, pendingModeration, totalSystems };
+};
+
 module.exports = {
   calculateUserScore,
   getSystemsForUser,
@@ -408,4 +456,8 @@ module.exports = {
   updateResource,
   deleteResource,
   getResourcesForSystemAdmin,
+  getPendingResources,
+  getModerationQueue,
+  moderateResource,
+  getAdminStats,
 };

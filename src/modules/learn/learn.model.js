@@ -17,8 +17,13 @@ const learningResourceSchema = new mongoose.Schema({
   url:         { type: String, required: true },
   sortOrder:   { type: Number, default: 0 },
   isActive:    { type: Boolean, default: true },
+  moderationStatus: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'approved' },
+  moderatedBy:      { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+  moderatedAt:      { type: Date, default: null },
+  moderationNote:   { type: String, default: '' },
 }, { timestamps: true });
 learningResourceSchema.index({ systemId: 1, sortOrder: 1 });
+learningResourceSchema.index({ moderationStatus: 1 });
 
 const resourceCompletionSchema = new mongoose.Schema({
   userId:            { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },

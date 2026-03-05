@@ -22,6 +22,7 @@ const createResourceSchema = Joi.object({
   description: Joi.string().allow('').default(''),
   url: Joi.string().uri().required(),
   sortOrder: Joi.number().integer().default(0),
+  moderationStatus: Joi.string().valid('pending', 'approved', 'rejected').default('approved'),
 });
 
 const updateResourceSchema = Joi.object({

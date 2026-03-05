@@ -7,6 +7,25 @@ const companySchema = new mongoose.Schema(
       required: [true, 'Company name is required'],
       trim: true,
     },
+    industry: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    phone: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    address: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );
