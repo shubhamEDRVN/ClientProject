@@ -13,6 +13,7 @@ import JobCosting from './pages/JobCosting';
 import Learn from './pages/Learn';
 import Scorecard from './pages/Scorecard';
 import AdminLearn from './pages/AdminLearn';
+import AdminPanel from './pages/AdminPanel';
 
 function RootRedirect() {
   const { isAuthenticated, loading } = useAuth();
@@ -74,6 +75,7 @@ export default function App() {
             <Route path="/learn" element={<Learn />} />
             <Route path="/scorecard" element={<Scorecard />} />
             <Route path="/admin/learn" element={<AdminRoute><AdminLearn /></AdminRoute>} />
+            <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
           </Route>
         </Routes>
       </AuthProvider>

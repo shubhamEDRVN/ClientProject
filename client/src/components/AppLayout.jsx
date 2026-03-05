@@ -13,6 +13,7 @@ import {
   X,
   BookOpen,
   Settings,
+  ShieldCheck,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -26,6 +27,7 @@ const NAV_ITEMS = [
 ];
 
 const ADMIN_NAV_ITEMS = [
+  { to: '/admin', label: 'Admin Panel', icon: ShieldCheck, adminOnly: true },
   { to: '/admin/learn', label: 'Manage Learn', icon: Settings, adminOnly: true },
 ];
 
