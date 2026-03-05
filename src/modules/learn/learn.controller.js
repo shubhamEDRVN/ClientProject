@@ -186,6 +186,68 @@ const adminDeleteResource = async (req, res, next) => {
   }
 };
 
+// ─── Admin: Moderation ──────────────────────────────────────────────
+
+const getPendingResources = async (req, res, next) => {
+  try {
+    const resources = await learnService.getPendingResources();
+    return successResponse(res, 200, 'Pending resources retrieved', { resources });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const getModerationQueue = async (req, res, next) => {
+  try {
+    const { status } = req.query;
+    const resources = await learnService.getModerationQueue(status || null);
+    return successResponse(res, 200, 'Moderation queue retrieved', { resources });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const approveResource = async (req, res, next) => {
+  try {
+    const { note } = req.body;
+    const resource = await learnService.moderateResource(
+      req.params.resourceId,
+      'approved',
+      req.user.userId,
+      note || ''
+    );
+    return successResponse(res, 200, 'Resource approved', { resource });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const rejectResource = async (req, res, next) => {
+  try {
+    const { note } = req.body;
+    const resource = await learnService.moderateResource(
+      req.params.resourceId,
+      'rejected',
+      req.user.userId,
+      note || ''
+    );
+    return successResponse(res, 200, 'Resource rejected', { resource });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ─── Admin: Dashboard Stats ─────────────────────────────────────────
+
+const getAdminStats = async (req, res, next) => {
+  try {
+    const stats = await learnService.getAdminStats();
+    return successResponse(res, 200, 'Admin stats retrieved', { stats });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   getSystems,
   getScore,
@@ -200,4 +262,9 @@ module.exports = {
   adminCreateResource,
   adminUpdateResource,
   adminDeleteResource,
+  getPendingResources,
+  getModerationQueue,
+  approveResource,
+  rejectResource,
+  getAdminStats,
 };

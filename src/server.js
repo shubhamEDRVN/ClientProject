@@ -16,6 +16,7 @@ const financialEngineRoutes = require('./core/financialEngine/financialEngine.ro
 const learnRoutes = require('./modules/learn/learn.routes');
 const scorecardRoutes = require('./modules/learn/scorecard.routes');
 const adminLearnRoutes = require('./modules/learn/admin.routes');
+const adminBusinessRoutes = require('./modules/admin/admin.routes');
 const { seedScorecardSystems } = require('./modules/learn/learn.seed');
 const errorHandler = require('./middleware/errorHandler');
 const logger = require('./utils/logger');
@@ -71,6 +72,7 @@ app.use('/api/financial', financialEngineRoutes);
 app.use('/api/learn', learnRoutes);
 app.use('/api/scorecard', scorecardRoutes);
 app.use('/api/admin', adminLearnRoutes);
+app.use('/api/admin', adminBusinessRoutes);
 
 // Global error handler
 app.use(errorHandler);

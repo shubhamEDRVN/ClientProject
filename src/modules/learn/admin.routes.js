@@ -19,4 +19,13 @@ router.post('/systems/:systemId/resources', learnController.adminCreateResource)
 router.put('/resources/:resourceId', learnController.adminUpdateResource);
 router.delete('/resources/:resourceId', learnController.adminDeleteResource);
 
+// Admin: Moderation
+router.get('/moderation', learnController.getModerationQueue);
+router.get('/moderation/pending', learnController.getPendingResources);
+router.put('/moderation/:resourceId/approve', learnController.approveResource);
+router.put('/moderation/:resourceId/reject', learnController.rejectResource);
+
+// Admin: Dashboard Stats
+router.get('/stats', learnController.getAdminStats);
+
 module.exports = router;
