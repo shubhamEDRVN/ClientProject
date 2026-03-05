@@ -313,7 +313,7 @@ function ModerationTab() {
   const fetchQueue = useCallback(async () => {
     setLoading(true);
     try {
-      const params = filter ? `?status=${filter}` : '';
+      const params = filter !== 'all' ? `?status=${filter}` : '';
       const res = await api.get(`/admin/moderation${params}`);
       setResources(res.data.data.resources);
     } catch {
@@ -346,15 +346,15 @@ function ModerationTab() {
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-gray-700">Content Moderation</h2>
         <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
-          {['pending', 'approved', 'rejected', ''].map((f) => (
+          {['pending', 'approved', 'rejected', 'all'].map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors capitalize ${
                 filter === f ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'
               }`}
             >
-              {f || 'All'}
+              {f}
             </button>
           ))}
         </div>

@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const { VALID_ROLES } = require('../../utils/constants');
 
 const updateCompanySchema = Joi.object({
   name: Joi.string().trim(),
@@ -9,7 +10,7 @@ const updateCompanySchema = Joi.object({
 }).min(1);
 
 const updateUserRoleSchema = Joi.object({
-  role: Joi.string().valid('owner', 'admin', 'viewer').required(),
+  role: Joi.string().valid(...VALID_ROLES).required(),
 });
 
 module.exports = {

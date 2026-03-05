@@ -1,6 +1,7 @@
 const Company = require('../company/company.model');
 const User = require('../auth/user.model');
 const ApiError = require('../../utils/ApiError');
+const { VALID_ROLES } = require('../../utils/constants');
 
 // ─── Business Management ────────────────────────────────────────────
 
@@ -110,9 +111,8 @@ const listUsers = async ({ search, role, page = 1, limit = 20 }) => {
 };
 
 const updateUserRole = async (userId, newRole) => {
-  const validRoles = ['owner', 'admin', 'viewer'];
-  if (!validRoles.includes(newRole)) {
-    throw ApiError.badRequest(`Invalid role. Must be one of: ${validRoles.join(', ')}`);
+  if (!VALID_ROLES.includes(newRole)) {
+    throw ApiError.badRequest(`Invalid role. Must be one of: ${VALID_ROLES.join(', ')}`);
   }
 
   const user = await User.findByIdAndUpdate(
