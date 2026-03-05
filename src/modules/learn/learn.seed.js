@@ -129,9 +129,16 @@ async function seedLearningResources() {
       return;
     }
 
+    const systemNames = learningResources.map((r) => r.systemName);
+    const systems = await ScorecardSystem.find({ name: { $in: systemNames }, isActive: true }).lean();
+    const systemByName = {};
+    for (const sys of systems) {
+      systemByName[sys.name] = sys;
+    }
+
     const resourcesToCreate = [];
     for (const item of learningResources) {
-      const system = await ScorecardSystem.findOne({ name: item.systemName, isActive: true });
+      const system = systemByName[item.systemName];
       if (!system) {
         logger.warn(`System not found for resource "${item.title}", skipping`);
         continue;
