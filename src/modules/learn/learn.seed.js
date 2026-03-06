@@ -130,9 +130,9 @@ async function seedLearningResources() {
     }
 
     const systemNames = learningResources.map((r) => r.systemName);
-    const systems = await ScorecardSystem.find({ name: { $in: systemNames }, isActive: true }).lean();
+    const matchedSystems = await ScorecardSystem.find({ name: { $in: systemNames }, isActive: true }).lean();
     const systemByName = {};
-    for (const sys of systems) {
+    for (const sys of matchedSystems) {
       systemByName[sys.name] = sys;
     }
 
