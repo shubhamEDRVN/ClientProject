@@ -6,14 +6,14 @@ const serviceItemSchema = Joi.object({
   category: Joi.string().valid('hvac', 'plumbing', 'electrical', 'general').default('general'),
   description: Joi.string().trim().max(500).allow('').default(''),
   material_cost: Joi.number().min(0).default(0),
-  material_markup_pct: Joi.number().min(0).max(500).default(25),
+  material_margin_pct: Joi.number().min(0).max(99).default(50),
   labor_hours: Joi.number().min(0).max(1000).default(1),
   hourly_rate_override: Joi.number().min(0).allow(null).default(null),
 });
 
 const pricingMatrixSchema = Joi.object({
   services: Joi.array().items(serviceItemSchema).max(200).default([]),
-  default_markup_pct: Joi.number().min(0).max(500).default(25),
+  default_margin_pct: Joi.number().min(0).max(99).default(50),
 });
 
 module.exports = { pricingMatrixSchema, serviceItemSchema };

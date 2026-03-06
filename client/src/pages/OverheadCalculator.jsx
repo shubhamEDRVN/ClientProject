@@ -253,8 +253,9 @@ export default function OverheadCalculator() {
             color="amber"
           />
           <ResultCard
-            label="Revenue Target (50% margin)"
+            label="Annual Revenue Target"
             value={formatCurrency(results.revenueTarget)}
+            sub="at 50% margin"
             color="green"
           />
           <ResultCard

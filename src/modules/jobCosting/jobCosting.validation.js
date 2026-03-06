@@ -6,7 +6,7 @@ const lineItemSchema = Joi.object({
   category: Joi.string().valid('hvac', 'plumbing', 'electrical', 'general').default('general'),
   description: Joi.string().trim().max(500).allow('').default(''),
   material_cost: Joi.number().min(0).default(0),
-  material_markup_pct: Joi.number().min(0).max(500).default(25),
+  material_margin_pct: Joi.number().min(0).max(99).default(50),
   labor_hours: Joi.number().min(0).max(1000).default(0),
   hourly_rate_override: Joi.number().min(0).allow(null).default(null),
   quantity: Joi.number().integer().min(1).max(999).default(1),
