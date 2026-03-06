@@ -78,7 +78,8 @@ function calculate(inputs) {
   const billableHoursPerTruck = workingDays * avgHours;
   const revenueTarget = totalBillableHours === 0 ? 0 : totalAnnualOverhead / 0.50;
   const overheadHourlyRate = totalBillableHours === 0 ? 0 : revenueTarget / totalBillableHours;
-  const techHourlyAddon = billableHoursPerTruck === 0 ? 0 : highestTechSalary / billableHoursPerTruck;
+  const techSalaryRevenueNeeded = highestTechSalary / 0.50;
+  const techHourlyAddon = billableHoursPerTruck === 0 ? 0 : techSalaryRevenueNeeded / billableHoursPerTruck;
   const finalBillableHourlyRate = overheadHourlyRate + techHourlyAddon;
   const estYearlyGross = finalBillableHourlyRate * totalBillableHours;
   const annualPerTruck = numTrucks === 0 ? 0 : estYearlyGross / numTrucks;
@@ -92,6 +93,7 @@ function calculate(inputs) {
     billableHoursPerTruck: Math.round(billableHoursPerTruck * 100) / 100,
     revenueTarget: Math.round(revenueTarget * 100) / 100,
     overheadHourlyRate: Math.round(overheadHourlyRate * 100) / 100,
+    techSalaryRevenueNeeded: Math.round(techSalaryRevenueNeeded * 100) / 100,
     techHourlyAddon: Math.round(techHourlyAddon * 100) / 100,
     finalBillableHourlyRate: Math.round(finalBillableHourlyRate * 100) / 100,
     estYearlyGross: Math.round(estYearlyGross * 100) / 100,
@@ -253,8 +255,14 @@ export default function OverheadCalculator() {
             color="amber"
           />
           <ResultCard
-            label="Annual Revenue Target"
+            label="Overhead Revenue Target"
             value={formatCurrency(results.revenueTarget)}
+            sub="at 50% margin"
+            color="green"
+          />
+          <ResultCard
+            label="Tech Salary Revenue Target"
+            value={formatCurrency(results.techSalaryRevenueNeeded)}
             sub="at 50% margin"
             color="green"
           />
