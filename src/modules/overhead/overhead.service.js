@@ -31,7 +31,7 @@ const calculateResults = (inputs) => {
   // Billable hours per truck
   const billableHoursPerTruck = workingDays.times(avgHours);
 
-  // Revenue Target = overhead / 0.50 (50% margin)
+  // Overhead Revenue Target = overhead / 0.50 (50% margin)
   const revenueTarget = totalBillableHours.isZero()
     ? new Decimal(0)
     : totalAnnualOverhead.dividedBy(new Decimal('0.50'));
@@ -41,10 +41,13 @@ const calculateResults = (inputs) => {
     ? new Decimal(0)
     : revenueTarget.dividedBy(totalBillableHours);
 
-  // Tech Hourly Add-on = Highest Tech Salary / Billable Hours Per Truck
+  // Tech Salary Revenue Needed = Tech Salary / 0.50 (50% margin on labor)
+  const techSalaryRevenueNeeded = highestTechSalary.dividedBy(new Decimal('0.50'));
+
+  // Tech Hourly Add-on = Tech Salary Revenue Needed / Billable Hours Per Truck
   const techHourlyAddon = billableHoursPerTruck.isZero()
     ? new Decimal(0)
-    : highestTechSalary.dividedBy(billableHoursPerTruck);
+    : techSalaryRevenueNeeded.dividedBy(billableHoursPerTruck);
 
   // Final Billable Hourly Rate
   const finalBillableHourlyRate = overheadHourlyRate.plus(techHourlyAddon);
@@ -78,6 +81,7 @@ const calculateResults = (inputs) => {
     billableHoursPerTruck: billableHoursPerTruck.toDecimalPlaces(2).toNumber(),
     revenueTarget: revenueTarget.toDecimalPlaces(2).toNumber(),
     overheadHourlyRate: overheadHourlyRate.toDecimalPlaces(2).toNumber(),
+    techSalaryRevenueNeeded: techSalaryRevenueNeeded.toDecimalPlaces(2).toNumber(),
     techHourlyAddon: techHourlyAddon.toDecimalPlaces(2).toNumber(),
     finalBillableHourlyRate: finalBillableHourlyRate.toDecimalPlaces(2).toNumber(),
     estYearlyGross: estYearlyGross.toDecimalPlaces(2).toNumber(),
