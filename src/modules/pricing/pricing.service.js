@@ -20,15 +20,16 @@ const getHourlyRate = async (userId) => {
 const calculateServicePricing = (services, fallbackRate) => {
   return services.map((svc) => {
     const materialCost = new Decimal(svc.material_cost || 0);
-    const markupPct = new Decimal(svc.material_markup_pct ?? 25);
+    const marginPct = new Decimal(svc.material_margin_pct ?? 50);
     const laborHours = new Decimal(svc.labor_hours || 0);
     const rate = new Decimal(svc.hourly_rate_override ?? fallbackRate);
 
-    const materialPrice = materialCost.times(new Decimal(1).plus(markupPct.dividedBy(100)));
+    const divisor = new Decimal(1).minus(marginPct.dividedBy(100));
+    const materialPrice = divisor.isZero() ? materialCost : materialCost.dividedBy(divisor);
     const laborPrice = laborHours.times(rate);
     const totalPrice = materialPrice.plus(laborPrice);
     const grossProfit = totalPrice.minus(materialCost);
-    const marginPct = totalPrice.isZero()
+    const calcMarginPct = totalPrice.isZero()
       ? new Decimal(0)
       : grossProfit.dividedBy(totalPrice).times(100);
 
@@ -38,7 +39,7 @@ const calculateServicePricing = (services, fallbackRate) => {
       category: svc.category,
       description: svc.description,
       material_cost: materialCost.toDecimalPlaces(2).toNumber(),
-      material_markup_pct: markupPct.toDecimalPlaces(2).toNumber(),
+      material_margin_pct: marginPct.toDecimalPlaces(2).toNumber(),
       labor_hours: laborHours.toDecimalPlaces(2).toNumber(),
       hourly_rate_override: svc.hourly_rate_override,
       // Calculated
@@ -47,7 +48,7 @@ const calculateServicePricing = (services, fallbackRate) => {
       labor_price: laborPrice.toDecimalPlaces(2).toNumber(),
       total_price: totalPrice.toDecimalPlaces(2).toNumber(),
       gross_profit: grossProfit.toDecimalPlaces(2).toNumber(),
-      margin_pct: marginPct.toDecimalPlaces(2).toNumber(),
+      margin_pct: calcMarginPct.toDecimalPlaces(2).toNumber(),
     };
   });
 };

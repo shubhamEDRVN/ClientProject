@@ -26,7 +26,7 @@ const EMPTY_LINE_ITEM = {
   category: 'general',
   description: '',
   material_cost: 0,
-  material_markup_pct: 25,
+  material_margin_pct: 50,
   labor_hours: 0,
   hourly_rate_override: null,
   quantity: 1,
@@ -45,18 +45,20 @@ function formatPct(val) {
 // Client-side calculation mirroring the server logic
 function calculateItem(item, fallbackRate) {
   const materialCost = parseFloat(item.material_cost) || 0;
-  const markupPct = parseFloat(item.material_markup_pct) ?? 25;
+  const marginPct = parseFloat(item.material_margin_pct) ?? 50;
   const laborHours = parseFloat(item.labor_hours) || 0;
   const rate = item.hourly_rate_override != null ? parseFloat(item.hourly_rate_override) : fallbackRate;
   const quantity = parseInt(item.quantity) || 1;
 
-  const materialPrice = materialCost * (1 + markupPct / 100);
+  // MARGIN formula: cost ÷ (1 - margin%)
+  const divisor = 1 - marginPct / 100;
+  const materialPrice = divisor === 0 ? materialCost : materialCost / divisor;
   const laborPrice = laborHours * rate;
   const unitPrice = materialPrice + laborPrice;
   const lineTotal = unitPrice * quantity;
   const lineCost = materialCost * quantity;
   const lineProfit = lineTotal - lineCost;
-  const marginPct = lineTotal === 0 ? 0 : (lineProfit / lineTotal) * 100;
+  const calcMarginPct = lineTotal === 0 ? 0 : (lineProfit / lineTotal) * 100;
 
   return {
     hourly_rate_used: Math.round(rate * 100) / 100,
@@ -66,7 +68,7 @@ function calculateItem(item, fallbackRate) {
     line_total: Math.round(lineTotal * 100) / 100,
     line_cost: Math.round(lineCost * 100) / 100,
     line_profit: Math.round(lineProfit * 100) / 100,
-    margin_pct: Math.round(marginPct * 10) / 10,
+    margin_pct: Math.round(calcMarginPct * 10) / 10,
   };
 }
 
@@ -224,7 +226,7 @@ export default function JobCosting() {
 
   const updateLineItem = (index, field, rawValue) => {
     const items = [...activeJob.line_items];
-    if (['material_cost', 'material_markup_pct', 'labor_hours'].includes(field)) {
+    if (['material_cost', 'material_margin_pct', 'labor_hours'].includes(field)) {
       items[index] = { ...items[index], [field]: rawValue === '' ? 0 : parseFloat(rawValue) || 0 };
     } else if (field === 'hourly_rate_override') {
       const parsed = parseFloat(rawValue);
@@ -763,16 +765,16 @@ function LineItemCard({ index, item, calc, hourlyRate, onUpdate, onRemove, onDup
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">Material Markup</label>
+                  <label className="block text-sm text-gray-600 mb-1">Material Margin</label>
                   <div className="relative">
                     <input
                       type="number"
                       min="0"
-                      max="500"
+                      max="99"
                       step="1"
-                      value={item.material_markup_pct || ''}
-                      onChange={(e) => onUpdate(index, 'material_markup_pct', e.target.value)}
-                      placeholder="25"
+                      value={item.material_margin_pct || ''}
+                      onChange={(e) => onUpdate(index, 'material_margin_pct', e.target.value)}
+                      placeholder="50"
                       className="input-field pr-7"
                     />
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
@@ -818,7 +820,7 @@ function LineItemCard({ index, item, calc, hourlyRate, onUpdate, onRemove, onDup
               <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Cost Breakdown</h3>
               <div className="space-y-2">
                 <PricingRow label="Material Cost" value={formatCurrency(item.material_cost)} />
-                <PricingRow label={`+ Markup (${item.material_markup_pct || 0}%)`} value={formatCurrency((calc.material_price || 0) - (item.material_cost || 0))} muted />
+                <PricingRow label={`+ Margin (${item.material_margin_pct || 0}%)`} value={formatCurrency((calc.material_price || 0) - (item.material_cost || 0))} muted />
                 <PricingRow label="= Material Price" value={formatCurrency(calc.material_price)} bold />
                 <div className="border-t border-gray-200 my-2"></div>
                 <PricingRow label={`Labor (${item.labor_hours || 0}h × ${formatCurrency(calc.hourly_rate_used)}/hr)`} value={formatCurrency(calc.labor_price)} />

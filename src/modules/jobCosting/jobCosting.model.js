@@ -9,7 +9,7 @@ const lineItemSchema = new mongoose.Schema({
   },
   description: { type: String, default: '', trim: true },
   material_cost: { type: Number, default: 0, min: 0 },
-  material_markup_pct: { type: Number, default: 25, min: 0 },
+  material_margin_pct: { type: Number, default: 50, min: 0, max: 99 },
   labor_hours: { type: Number, default: 0, min: 0 },
   hourly_rate_override: { type: Number, default: null },
   quantity: { type: Number, default: 1, min: 1 },

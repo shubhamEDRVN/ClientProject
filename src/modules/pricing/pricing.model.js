@@ -9,7 +9,7 @@ const serviceItemSchema = new mongoose.Schema({
   },
   description: { type: String, default: '', trim: true },
   material_cost: { type: Number, default: 0, min: 0 },
-  material_markup_pct: { type: Number, default: 25, min: 0 },
+  material_margin_pct: { type: Number, default: 50, min: 0, max: 99 },
   labor_hours: { type: Number, default: 1, min: 0 },
   // hourly_rate is fetched from overhead at calculation time; user can also override per-item
   hourly_rate_override: { type: Number, default: null },
@@ -24,8 +24,8 @@ const pricingMatrixSchema = new mongoose.Schema(
       unique: true,
     },
     services: [serviceItemSchema],
-    // Global default markup % applied to new items
-    default_markup_pct: { type: Number, default: 25, min: 0 },
+    // Global default margin % applied to new items
+    default_margin_pct: { type: Number, default: 50, min: 0, max: 99 },
   },
   { timestamps: true }
 );

@@ -21,18 +21,19 @@ const getHourlyRate = async (userId) => {
 const calculateLineItems = (lineItems, fallbackRate) => {
   return lineItems.map((item) => {
     const materialCost = new Decimal(item.material_cost || 0);
-    const markupPct = new Decimal(item.material_markup_pct ?? 25);
+    const marginPct = new Decimal(item.material_margin_pct ?? 50);
     const laborHours = new Decimal(item.labor_hours || 0);
     const rate = new Decimal(item.hourly_rate_override ?? fallbackRate);
     const quantity = new Decimal(item.quantity || 1);
 
-    const materialPrice = materialCost.times(new Decimal(1).plus(markupPct.dividedBy(100)));
+    const divisor = new Decimal(1).minus(marginPct.dividedBy(100));
+    const materialPrice = divisor.isZero() ? materialCost : materialCost.dividedBy(divisor);
     const laborPrice = laborHours.times(rate);
     const unitPrice = materialPrice.plus(laborPrice);
     const lineTotal = unitPrice.times(quantity);
     const lineCost = materialCost.times(quantity);
     const lineProfit = lineTotal.minus(lineCost);
-    const marginPct = lineTotal.isZero()
+    const calcMarginPct = lineTotal.isZero()
       ? new Decimal(0)
       : lineProfit.dividedBy(lineTotal).times(100);
 
@@ -42,7 +43,7 @@ const calculateLineItems = (lineItems, fallbackRate) => {
       category: item.category,
       description: item.description,
       material_cost: materialCost.toDecimalPlaces(2).toNumber(),
-      material_markup_pct: markupPct.toDecimalPlaces(2).toNumber(),
+      material_margin_pct: marginPct.toDecimalPlaces(2).toNumber(),
       labor_hours: laborHours.toDecimalPlaces(2).toNumber(),
       hourly_rate_override: item.hourly_rate_override,
       quantity: quantity.toNumber(),
@@ -54,7 +55,7 @@ const calculateLineItems = (lineItems, fallbackRate) => {
       line_total: lineTotal.toDecimalPlaces(2).toNumber(),
       line_cost: lineCost.toDecimalPlaces(2).toNumber(),
       line_profit: lineProfit.toDecimalPlaces(2).toNumber(),
-      margin_pct: marginPct.toDecimalPlaces(2).toNumber(),
+      margin_pct: calcMarginPct.toDecimalPlaces(2).toNumber(),
     };
   });
 };

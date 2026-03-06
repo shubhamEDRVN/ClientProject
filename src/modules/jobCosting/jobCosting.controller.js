@@ -5,6 +5,9 @@ const ApiError = require('../../utils/ApiError');
 
 const createJob = async (req, res, next) => {
   try {
+    if (!req.user.companyId) {
+      return next(ApiError.badRequest('Company ID missing from session. Please log out and log in again.'));
+    }
     const { error, value } = createJobSchema.validate(req.body, { abortEarly: false, stripUnknown: true });
     if (error) {
       return next(ApiError.badRequest(error.details.map((d) => d.message).join(', ')));

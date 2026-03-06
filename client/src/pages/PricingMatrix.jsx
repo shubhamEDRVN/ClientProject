@@ -14,7 +14,7 @@ const EMPTY_SERVICE = {
   category: 'general',
   description: '',
   material_cost: 0,
-  material_markup_pct: 25,
+  material_margin_pct: 50,
   labor_hours: 1,
   hourly_rate_override: null,
 };
@@ -32,15 +32,16 @@ function formatPct(val) {
 // Client-side calculation mirroring the server logic
 function calculateItem(svc, fallbackRate) {
   const materialCost = parseFloat(svc.material_cost) || 0;
-  const markupPct = parseFloat(svc.material_markup_pct) ?? 25;
+  const marginPct = parseFloat(svc.material_margin_pct) ?? 50;
   const laborHours = parseFloat(svc.labor_hours) || 0;
   const rate = svc.hourly_rate_override != null ? parseFloat(svc.hourly_rate_override) : fallbackRate;
 
-  const materialPrice = materialCost * (1 + markupPct / 100);
+  const divisor = 1 - marginPct / 100;
+  const materialPrice = divisor === 0 ? materialCost : materialCost / divisor;
   const laborPrice = laborHours * rate;
   const totalPrice = materialPrice + laborPrice;
   const grossProfit = totalPrice - materialCost;
-  const marginPct = totalPrice === 0 ? 0 : (grossProfit / totalPrice) * 100;
+  const calcMarginPct = totalPrice === 0 ? 0 : (grossProfit / totalPrice) * 100;
 
   return {
     hourly_rate_used: Math.round(rate * 100) / 100,
@@ -48,13 +49,13 @@ function calculateItem(svc, fallbackRate) {
     labor_price: Math.round(laborPrice * 100) / 100,
     total_price: Math.round(totalPrice * 100) / 100,
     gross_profit: Math.round(grossProfit * 100) / 100,
-    margin_pct: Math.round(marginPct * 10) / 10,
+    margin_pct: Math.round(calcMarginPct * 10) / 10,
   };
 }
 
 export default function PricingMatrix() {
   const [services, setServices] = useState([]);
-  const [defaultMarkup, setDefaultMarkup] = useState(25);
+  const [defaultMargin, setDefaultMargin] = useState(50);
   const [hourlyRate, setHourlyRate] = useState(0);
   const [calculations, setCalculations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -63,9 +64,9 @@ export default function PricingMatrix() {
   const [filterCategory, setFilterCategory] = useState('all');
   const autoSaveTimer = useRef(null);
   const servicesRef = useRef(services);
-  const defaultMarkupRef = useRef(defaultMarkup);
+  const defaultMarginRef = useRef(defaultMargin);
   servicesRef.current = services;
-  defaultMarkupRef.current = defaultMarkup;
+  defaultMarginRef.current = defaultMargin;
 
   // Load saved data on mount
   useEffect(() => {
@@ -74,7 +75,7 @@ export default function PricingMatrix() {
         if (res.data.success && res.data.data.inputs) {
           const saved = res.data.data.inputs;
           setServices(saved.services || []);
-          setDefaultMarkup(saved.default_markup_pct ?? 25);
+          setDefaultMargin(saved.default_margin_pct ?? 50);
           setHourlyRate(res.data.data.hourlyRate || 0);
           setCalculations(res.data.data.calculations || []);
         } else {
@@ -93,12 +94,12 @@ export default function PricingMatrix() {
     }
   }, [services, hourlyRate, loading]);
 
-  const saveToServer = useCallback(async (svcData, markupData) => {
+  const saveToServer = useCallback(async (svcData, marginData) => {
     try {
       setSaving(true);
       const payload = {
         services: svcData,
-        default_markup_pct: markupData,
+        default_margin_pct: marginData,
       };
       const res = await api.post('/pricing/save', payload);
       if (res.data.success) {
@@ -118,20 +119,20 @@ export default function PricingMatrix() {
   useEffect(() => {
     autoSaveTimer.current = setInterval(() => {
       if (servicesRef.current.length > 0) {
-        saveToServer(servicesRef.current, defaultMarkupRef.current);
+        saveToServer(servicesRef.current, defaultMarginRef.current);
       }
     }, 60000);
     return () => clearInterval(autoSaveTimer.current);
   }, [saveToServer]);
 
   const handleManualSave = () => {
-    saveToServer(services, defaultMarkup);
+    saveToServer(services, defaultMargin);
   };
 
   const addService = () => {
     setServices([
       ...services,
-      { ...EMPTY_SERVICE, material_markup_pct: defaultMarkup },
+      { ...EMPTY_SERVICE, material_margin_pct: defaultMargin },
     ]);
   };
 
@@ -141,7 +142,7 @@ export default function PricingMatrix() {
 
   const updateService = (index, field, rawValue) => {
     const updated = [...services];
-    if (['material_cost', 'material_markup_pct', 'labor_hours'].includes(field)) {
+    if (['material_cost', 'material_margin_pct', 'labor_hours'].includes(field)) {
       updated[index] = { ...updated[index], [field]: rawValue === '' ? 0 : parseFloat(rawValue) || 0 };
     } else if (field === 'hourly_rate_override') {
       const parsed = parseFloat(rawValue);
@@ -266,15 +267,15 @@ export default function PricingMatrix() {
       {/* Default Markup + Filter */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
         <div className="flex items-center gap-2">
-          <label className="text-sm text-gray-600 whitespace-nowrap">Default Material Markup:</label>
+          <label className="text-sm text-gray-600 whitespace-nowrap">Default Material Margin:</label>
           <div className="relative w-24">
             <input
               type="number"
               min="0"
-              max="500"
+              max="99"
               step="1"
-              value={defaultMarkup}
-              onChange={(e) => setDefaultMarkup(e.target.value === '' ? 0 : parseFloat(e.target.value) || 0)}
+              value={defaultMargin}
+              onChange={(e) => setDefaultMargin(e.target.value === '' ? 0 : parseFloat(e.target.value) || 0)}
               className="w-full pr-7 pl-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
@@ -493,16 +494,16 @@ function ServiceCard({ index, service, calc, hourlyRate, onUpdate, onRemove, onD
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">Material Markup</label>
+                  <label className="block text-sm text-gray-600 mb-1">Material Margin</label>
                   <div className="relative">
                     <input
                       type="number"
                       min="0"
-                      max="500"
+                      max="99"
                       step="1"
-                      value={service.material_markup_pct || ''}
-                      onChange={(e) => onUpdate(index, 'material_markup_pct', e.target.value)}
-                      placeholder="25"
+                      value={service.material_margin_pct || ''}
+                      onChange={(e) => onUpdate(index, 'material_margin_pct', e.target.value)}
+                      placeholder="50"
                       className="input-field pr-7"
                     />
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
@@ -548,7 +549,7 @@ function ServiceCard({ index, service, calc, hourlyRate, onUpdate, onRemove, onD
               <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Pricing Breakdown</h3>
               <div className="space-y-2">
                 <PricingRow label="Material Cost" value={formatCurrency(service.material_cost)} />
-                <PricingRow label={`+ Markup (${service.material_markup_pct || 0}%)`} value={formatCurrency((calc.material_price || 0) - (service.material_cost || 0))} muted />
+                <PricingRow label={`+ Margin (${service.material_margin_pct || 0}%)`} value={formatCurrency((calc.material_price || 0) - (service.material_cost || 0))} muted />
                 <PricingRow label="= Material Price" value={formatCurrency(calc.material_price)} bold />
                 <div className="border-t border-gray-200 my-2"></div>
                 <PricingRow label={`Labor (${service.labor_hours || 0}h × ${formatCurrency(calc.hourly_rate_used)}/hr)`} value={formatCurrency(calc.labor_price)} />
