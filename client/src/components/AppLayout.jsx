@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard,
@@ -7,22 +7,34 @@ import {
   Grid3X3,
   Briefcase,
   Award,
-  Target,
   Menu,
   LogOut,
   X,
   BookOpen,
   Settings,
+  Wrench,
+  ChevronDown,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/overhead-calculator', label: 'Overhead Calculator', icon: Calculator },
-  { to: '/pricing-matrix', label: 'Pricing Matrix', icon: Grid3X3 },
-  { to: '/job-costing', label: 'Job Costing', icon: Briefcase },
-  { to: '/learn', label: 'Learn', icon: BookOpen },
-  { to: '/scorecard', label: 'Scorecard', icon: Award },
-  { to: '/revenue-plan', label: 'Revenue Plan', icon: Target, disabled: true },
+  {
+    label: 'Tools',
+    icon: Wrench,
+    children: [
+      { to: '/overhead-calculator', label: 'Overhead Calculator', icon: Calculator },
+      { to: '/pricing-matrix', label: 'Pricing Matrix', icon: Grid3X3 },
+      { to: '/job-costing', label: 'Job Costing', icon: Briefcase },
+    ],
+  },
+  {
+    label: 'Learn',
+    icon: BookOpen,
+    children: [
+      { to: '/learn', label: 'Learn', icon: BookOpen },
+      { to: '/scorecard', label: 'Scorecard', icon: Award },
+    ],
+  },
 ];
 
 const ADMIN_NAV_ITEMS = [
@@ -31,8 +43,17 @@ const ADMIN_NAV_ITEMS = [
 
 export default function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [openMenus, setOpenMenus] = useState({});
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const toggleMenu = (label) => {
+    setOpenMenus((prev) => ({ ...prev, [label]: !prev[label] }));
+  };
+
+  const isChildActive = (children) =>
+    children.some((child) => location.pathname === child.to);
 
   const handleLogout = async () => {
     await logout();
@@ -70,17 +91,57 @@ export default function AppLayout() {
         <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
-            return item.disabled ? (
-              <span
-                key={item.to}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-gray-400 cursor-not-allowed"
-                title="Coming soon"
-              >
-                <Icon className="w-5 h-5" />
-                <span>{item.label}</span>
-                <span className="ml-auto text-xs bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded">Soon</span>
-              </span>
-            ) : (
+
+            if (item.children) {
+              const isOpen = openMenus[item.label] || false;
+              const childActive = isChildActive(item.children);
+              return (
+                <div key={item.label}>
+                  <button
+                    onClick={() => toggleMenu(item.label)}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all duration-200 ${
+                      childActive
+                        ? 'bg-blue-50 text-blue-600'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
+                    <span>{item.label}</span>
+                    <ChevronDown
+                      className={`w-4 h-4 ml-auto transition-transform duration-200 ${
+                        isOpen ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                  {isOpen && (
+                    <div className="ml-4 mt-1 space-y-1">
+                      {item.children.map((child) => {
+                        const ChildIcon = child.icon;
+                        return (
+                          <NavLink
+                            key={child.to}
+                            to={child.to}
+                            onClick={() => setSidebarOpen(false)}
+                            className={({ isActive }) =>
+                              `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                                isActive
+                                  ? 'bg-blue-50 text-blue-600 border-l-2 border-blue-500'
+                                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                              }`
+                            }
+                          >
+                            <ChildIcon className="w-4 h-4" />
+                            <span>{child.label}</span>
+                          </NavLink>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            return (
               <NavLink
                 key={item.to}
                 to={item.to}
