@@ -16,7 +16,7 @@ const financialEngineRoutes = require('./core/financialEngine/financialEngine.ro
 const learnRoutes = require('./modules/learn/learn.routes');
 const scorecardRoutes = require('./modules/learn/scorecard.routes');
 const adminLearnRoutes = require('./modules/learn/admin.routes');
-const { seedScorecardSystems } = require('./modules/learn/learn.seed');
+const { seedScorecardSystems, seedLearningResources } = require('./modules/learn/learn.seed');
 const errorHandler = require('./middleware/errorHandler');
 const logger = require('./utils/logger');
 
@@ -80,6 +80,7 @@ const PORT = process.env.PORT || 5000;
 const startServer = async () => {
   await connectDB();
   await seedScorecardSystems();
+  await seedLearningResources();
   app.listen(PORT, () => {
     logger.info(`Server running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
   });

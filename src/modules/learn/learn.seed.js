@@ -1,4 +1,4 @@
-const { ScorecardSystem } = require('./learn.model');
+const { ScorecardSystem, LearningResource } = require('./learn.model');
 const logger = require('../../utils/logger');
 
 const systems = [
@@ -85,4 +85,81 @@ async function seedScorecardSystems() {
   }
 }
 
-module.exports = { seedScorecardSystems };
+// Learning resources: YouTube playlists and videos mapped to scorecard systems
+const learningResources = [
+  {
+    systemName: 'Social media content calendar',
+    type: 'video',
+    title: 'YouTube Training: Marketing & Social Media Strategy',
+    description: 'Full YouTube playlist covering social media content strategy and marketing best practices.',
+    url: 'https://www.youtube.com/playlist?list=PL1NdI7-ewuRNkYkFQ2eCG5-raHIwS3ssf',
+    sortOrder: 1,
+  },
+  {
+    systemName: 'Technicians trained on presenting options (Good/Better/Best)',
+    type: 'video',
+    title: 'YouTube Training: Sales Presentation Techniques',
+    description: 'Full YouTube playlist on presenting service options and closing sales effectively.',
+    url: 'https://www.youtube.com/playlist?list=PL1NdI7-ewuRPYQ2XdYHaDF0ArNipAFyqI',
+    sortOrder: 1,
+  },
+  {
+    systemName: 'Standard operating procedures (SOPs) for technicians',
+    type: 'video',
+    title: 'YouTube Training: Standard Operating Procedures',
+    description: 'Full YouTube playlist on building and implementing SOPs for service teams.',
+    url: 'https://www.youtube.com/playlist?list=PL1NdI7-ewuROSz1iMl211LU0s3wlukGaS',
+    sortOrder: 1,
+  },
+  {
+    systemName: 'Owner working ON the business, not just IN it',
+    type: 'video',
+    title: 'YouTube Training: Business Leadership & Growth',
+    description: 'YouTube playlist on transitioning from working in the business to leading and growing it.',
+    url: 'https://www.youtube.com/watch?v=i4HDrJ1EQAs&list=PL1NdI7-ewuROijUvyx1GQK5IUOUF78OmO',
+    sortOrder: 1,
+  },
+];
+
+async function seedLearningResources() {
+  try {
+    const existingCount = await LearningResource.countDocuments();
+    if (existingCount > 0) {
+      logger.info(`Learning resources already seeded (${existingCount} found)`);
+      return;
+    }
+
+    const systemNames = learningResources.map((r) => r.systemName);
+    const matchedSystems = await ScorecardSystem.find({ name: { $in: systemNames }, isActive: true }).lean();
+    const systemByName = {};
+    for (const sys of matchedSystems) {
+      systemByName[sys.name] = sys;
+    }
+
+    const resourcesToCreate = [];
+    for (const item of learningResources) {
+      const system = systemByName[item.systemName];
+      if (!system) {
+        logger.warn(`System not found for resource "${item.title}", skipping`);
+        continue;
+      }
+      resourcesToCreate.push({
+        systemId: system._id,
+        type: item.type,
+        title: item.title,
+        description: item.description,
+        url: item.url,
+        sortOrder: item.sortOrder,
+      });
+    }
+
+    if (resourcesToCreate.length > 0) {
+      await LearningResource.insertMany(resourcesToCreate);
+      logger.info(`Seeded ${resourcesToCreate.length} learning resources`);
+    }
+  } catch (err) {
+    logger.error('Error seeding learning resources:', err.message);
+  }
+}
+
+module.exports = { seedScorecardSystems, seedLearningResources };
